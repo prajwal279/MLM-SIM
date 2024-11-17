@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Structure</title>
+</head>
+<body>
+    <h1>Tree Structure</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Parent ID</th>
+            <th>Position</th>
+            <th>Level</th>
+            {% comment %} <th>LEFT</th>
+            <th>RIGHT</th> {% endcomment %}
+            {% comment %} <th>LEFT_CHILD</th>
+            <th>RIGHT_CHILD</th> {% endcomment %}
+            <th>Sponsor Bonus</th>
+            <th>Binary Bonus</th>
+            <th>Matching Bonus</th>
+            {% comment %} <th>Flushed Amount</th> {% endcomment %}
+            <th>Carry Forward</th>
+        </tr>
+        {% for node in results.tree_structure %}
+            <tr>
+                <td>{{ node.user_id }}</td>
+                <td>{{ node.parentid|default:"NULL" }}</td>
+                <td>{{ node.position|default:"NULL" }}</td>
+                <td>{{ node.levels }}</td>
+                {% comment %} <td>{{ node.lft }}</td>
+                <td>{{ node.rgt }}</td> {% endcomment %}
+                {% comment %} <td>{{ node.left.user_id|default:"NULL" }}</td>
+                <td>{{ node.right.user_id|default:"NULL" }}</td> {% endcomment %}
+                <td>{{ node.sponsor_bonus }}</td>
+                <td>{{ node.binary_bonus }}</td>
+                <td>{{ node.matching_bonus }}</td>
+                {% comment %} <td>{{ node.capping_value }}</td> {% endcomment %}
+                <td>{{ node.carry_forward }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
+    <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
+</body>
+</html>

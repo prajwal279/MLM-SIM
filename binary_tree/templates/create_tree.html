@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Binary Tree</title>
+</head>
+<body>
+    <h1>Create Binary Tree</h1>
+
+    <form action="{% url 'create_tree' %}" method="POST">
+        {% csrf_token %}
+        <label for="root_user_id">Root User ID:</label><br>
+        <input type="text" id="root_user_id" name="root_user_id" required><br><br>
+
+        <label for="levels">Number of Levels:</label><br>
+        <input type="number" id="levels" name="levels" required min="1"><br><br>
+
+        <input type="submit" value="Create Tree">
+    </form>
+
+</body>
+</html>
