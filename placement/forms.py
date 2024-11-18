@@ -9,7 +9,14 @@ class MemberForm(forms.Form):
     product_quantity = forms.CharField(max_length=255, required=False)
     capping_limit = forms.FloatField(label="Capping Limit", min_value=0)
     cycle = forms.IntegerField(label="No of Cycles",min_value=1)
-
+    
+    RATIO_CHOICES = [
+        ('1', '1:1'),
+        ('2', '1:2'),
+        ('3', '2:1'),
+    ]
+    ratio = forms.ChoiceField(choices=RATIO_CHOICES,widget=forms.RadioSelect,label="Binary Ratio",required=True)
+    ratio_amount = forms.FloatField(label="Ratio Amount",min_value=1)
     BONUS_TYPE_CHOICES = [
         ('binary', 'Binary Bonus'),
         ('matching', 'Matching Bonus'),

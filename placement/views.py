@@ -18,6 +18,8 @@ def build_new_tree(request):
             carry_yes_no = form.cleaned_data['carry_yes_no']
             matching_bonus_percents = [int(level.strip()) for level in form.cleaned_data.get('matching_bonus_percent', '').split(",") if level.strip().isdigit()]
             cycle = form.cleaned_data['cycle']
+            ratio = form.cleaned_data['ratio']
+            ratio_amount = form.cleaned_data['ratio_amount']
             data = {
                 "num_members": num_members,
                 "sponsor_percentage": sponsor_bonus_percent,
@@ -28,10 +30,9 @@ def build_new_tree(request):
                 "capping_scope": carry_yes_no,
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
+                "ratio":ratio,
+                "ratio_amount":ratio_amount,
             }
-
-            print("joining",joining_package_fee)
-            print("pq",product_quantity)
             try:
                 response = requests.post('http://localhost:9000/calculate', json=data)
                 response.raise_for_status() 
