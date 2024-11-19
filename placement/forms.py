@@ -11,9 +11,9 @@ class MemberForm(forms.Form):
     cycle = forms.IntegerField(label="No of Cycles",min_value=1)
     
     RATIO_CHOICES = [
-        ('1', '1:1'),
-        ('2', '1:2'),
-        ('3', '2:1'),
+        (1, '1:1'),
+        (2, '1:2'),
+        (3, '2:1'),
     ]
     ratio = forms.ChoiceField(choices=RATIO_CHOICES,widget=forms.RadioSelect,label="Binary Ratio",required=True)
     ratio_amount = forms.FloatField(label="Ratio Amount",min_value=1)
