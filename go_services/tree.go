@@ -100,7 +100,7 @@ var treeNodes []*TreeStructure
 
 func buildTree(root *TreeStructure, numMembers int, startID int, joining_package_fee []float64) []*TreeStructure {
 	if numMembers <= 0 {
-		fmt.Println("Invalid input: numMembers or cycles is non-positive")
+		//fmt.Println("Invalid input: numMembers or cycles is non-positive")
 		return nil
 	}
 
@@ -185,24 +185,32 @@ func AssignJoiningFee(nodes []*TreeStructure, joining_package_fee []float64, pro
 
 func AllocateMembers(numMembers int, product_quantity []int, startID int, result []*TreeStructure, joining_package_fee []float64) ([][]int, int, [][]*TreeStructure) {
 	currentID := startID
-	remaing := numMembers + 2
+	remaining := numMembers + 2
 	var allCycles [][]int
+	var allData [][]*TreeStructure
 	cycleCount := 0
-	for remaing > 2 {
+
+	for remaining > 2 {
 		var cycle [][]int
+
+		// Allocate members for this cycle based on product quantities
 		for _, qty := range product_quantity {
-			cycleID := []int{}
-			for j := 0; j < qty && remaing > 2; j++ {
-				cycleID = append(cycleID, currentID)
-				currentID++
-				remaing--
-			}
-			cycle = append(cycle, cycleID)
-			if remaing <= 0 {
+			if remaining <= 2 {
 				break
 			}
-
+			// Preallocate slice for better memory management
+			cycleID := make([]int, 0, qty)
+			for j := 0; j < qty && remaining > 2; j++ {
+				cycleID = append(cycleID, currentID)
+				currentID++
+				remaining--
+			}
+			if len(cycleID) > 0 {
+				cycle = append(cycle, cycleID)
+			}
 		}
+
+		// Filter relevant nodes from the result
 		var temp []*TreeStructure
 		for _, node := range result {
 			if node.UserID < currentID {
@@ -212,13 +220,9 @@ func AllocateMembers(numMembers int, product_quantity []int, startID int, result
 		AssignJoiningFee(temp, joining_package_fee, product_quantity)
 		all_data = append(all_data, temp)
 		cycleCount++
-		for _, lst := range cycle {
-			if len(lst) > 0 {
-				allCycles = append(allCycles, lst)
-			}
-		}
 	}
-	return allCycles, cycleCount, all_data
+
+	return allCycles, cycleCount, allData
 }
 
 func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, joining_package_fee []float64, cappingAmount float64, cappingScope string, numMembers int) float64 {
@@ -357,17 +361,17 @@ func BinaryWithRatio(allData [][]TreeStructure, joining_package_fee []float64, b
 }
 
 func sendResultsToDjango(results interface{}) {
+	//fmt.Println("results: ",results)
 	jsonData, err := json.Marshal(results)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	resp, err := http.Post("http://localhost:8000/process_results/", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("Response from Django:", resp.Status)
+	//fmt.Println("Response from Django:", resp.Status)
 }
 
 func main() {
@@ -378,7 +382,7 @@ func main() {
 			return
 		}
 
-		fmt.Println("Received data:", data)
+		//fmt.Println("Received data:", data)
 
 		numMembers, ok := data["num_members"].(float64)
 		if !ok {
@@ -454,6 +458,7 @@ func main() {
 		}
 		//var treeNodes []*TreeStructure
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
+		fmt.Println("#############start###############")
 		result := buildTree(root, int(numMembers), 2, floatData)
 		// for _, tree := range result {
 		// 	treeNodes = append(treeNodes, tree)
@@ -530,7 +535,6 @@ func main() {
 			// "total_matching_bonus": totalMatchingBonus,
 		}
 		sendResultsToDjango(results)
-
 		fmt.Println("Results sent to Django.")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
