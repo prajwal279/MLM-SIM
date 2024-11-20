@@ -59,12 +59,13 @@ def process_results(request):
             
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-        
+        cycles = data.get('cycles', {})
         nodes = data.get('tree_structure', [])
         context={}
         context['sponsor_bonus']="sponsor_bonus---"
         context['binary_bonus']="binary_bonus---"
         context['nodes']=nodes
+        context['cycles']=cycles
         
         render_context = render(request, 'display_members.html', context)
         return render_context
