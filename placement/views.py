@@ -38,7 +38,7 @@ def build_new_tree(request):
                 response.raise_for_status() 
 
                 results = response.json()
-                
+                    
                 print(results)
                 return render(request, 'display_members.html', {
                     'results': results,

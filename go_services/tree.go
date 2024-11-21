@@ -332,7 +332,8 @@ func BinaryWithRatio(allData [][]*TreeStructure, joining_package_fee []float64, 
 func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) map[int]float64 {
 	totalBonus := make(map[int]float64)
 
-	for _, members := range allData {
+	for i, members := range allData {
+		fmt.Println("i---", i)
 		for _, member := range members {
 			iterant := 0
 			if member.ParentID == nil {
@@ -341,17 +342,46 @@ func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []fl
 			parent := member.ParentID
 			ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 
-			totalBonus[member.UserID] += parent.MatchingBonus
+			totalBonus[i] += parent.MatchingBonus
+			fmt.Println(">>>>>>", parent.MatchingBonus)
+			fmt.Println(">>>>>>member", member.MatchingBonus)
 		}
 	}
-	for _, members := range allData {
-		for _, member := range members {
-			totalBonus[member.UserID] = member.MatchingBonus
-			fmt.Println(member.MatchingBonus)
-		}
-	}
+	// for _, members := range allData {
+	// 	for _, member := range members {
+	// 		totalBonus[member.UserID] = member.MatchingBonus
+	// 		// fmt.Println(member.MatchingBonus)
+	// 	}
+	// }
+	fmt.Println("********88", totalBonus)
 	return totalBonus
 }
+
+// func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) float64 {
+// 	var totalBonus float64
+// 	// var totalBonus map[int]float64
+
+// 	for _, members := range allData {
+// 		for _, member := range members {
+// 			iterant := 0
+// 			if member.ParentID == nil {
+// 				continue
+// 			}
+// 			parent := member.ParentID
+// 			ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
+
+// 			totalBonus += parent.MatchingBonus
+// 		}
+// 	}
+// 	for _, members := range allData {
+// 		for _, member := range members {
+// 			totalBonus = member.MatchingBonus
+// 			fmt.Println("efef",totalBonus)
+// 		}
+// 	}
+// 	fmt.Println("efef",totalBonus)
+// 	return totalBonus
+// }
 
 func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPercentages []float64, iterant int, cappingAmount float64, cappingScope string) {
 	if iterant >= len(matchingPercentages) || parent == nil {
@@ -519,7 +549,7 @@ func main() {
 		totalMatchingBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
 		for _, list := range cycleList {
 			for _, member := range list {
-				fmt.Println(member.MatchingBonus)
+				fmt.Println("---", member.MatchingBonus)
 			}
 		}
 		results := map[string]interface{}{
