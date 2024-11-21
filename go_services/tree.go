@@ -228,7 +228,7 @@ func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float
 			var rightBonus, leftBonus float64
 			if member.RightMember != nil {
 				rightBonus = member.RightMember.Joining_package_fee * sponsorBonusPercent / 100
-			} 
+			}
 			if member.LeftMember != nil {
 				leftBonus = member.LeftMember.Joining_package_fee * sponsorBonusPercent / 100
 			}
@@ -256,13 +256,16 @@ func Traverse(node *TreeStructure, limit int) float64 {
 }
 
 func BinaryWithRatio(allData [][]*TreeStructure, joining_package_fee []float64, binaryRatio string, ratioAmount int, cappingScope string, cappingAmount float64, cycleCount int) float64 {
-
 	var total float64
 	b1 := 10
 	b2 := 15
 	b3 := 20
-	for _, nodeList := range allData {
+	for i, nodeList := range allData {
 		for _, node := range nodeList {
+			if i != 0 && node.UserID < len(allData[i-1]) {
+				node.LeftCarry = allData[i-1][node.UserID-1].LeftCarry
+				node.RightCarry = allData[i-1][node.UserID-1].RightCarry
+			}
 			node.LeftDownlineSale = float64(node.LeftCarry)
 			node.RightDownlineSale = float64(node.RightCarry)
 			var leftDownline, rightDownline float64
@@ -272,8 +275,10 @@ func BinaryWithRatio(allData [][]*TreeStructure, joining_package_fee []float64, 
 			if node.RightMember != nil {
 				rightDownline = Traverse(node.RightMember, len(nodeList))
 			}
+
 			node.LeftDownlineSale = float64(leftDownline) + float64(node.LeftCarry)
 			node.RightDownlineSale = float64(rightDownline) + float64(node.RightCarry)
+
 			var left, right, noOfPairs, carryLeft, carryRight int
 			switch binaryRatio {
 			case "1":
@@ -292,7 +297,9 @@ func BinaryWithRatio(allData [][]*TreeStructure, joining_package_fee []float64, 
 
 			node.LeftCarry = carryLeft
 			node.RightCarry = carryRight
+
 			minimumVal := int(math.Min(float64(noOfPairs*left), float64(noOfPairs*right)))
+
 			var bonusPerc int
 			switch {
 			case noOfPairs > 0 && noOfPairs <= 5:
@@ -306,17 +313,60 @@ func BinaryWithRatio(allData [][]*TreeStructure, joining_package_fee []float64, 
 			}
 
 			nodeBonus := (minimumVal * bonusPerc) / 100
+
 			if cappingScope == "binary" {
 				if nodeBonus > int(cappingAmount) {
 					node.FlushOut = nodeBonus - int(cappingAmount)
 					nodeBonus = int(cappingAmount)
 				}
 			}
+
 			node.BinaryBonus = float64(nodeBonus)
 			total += float64(nodeBonus)
+
 		}
 	}
 	return total
+}
+
+func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) map[int]float64 {
+	totalBonus := make(map[int]float64)
+
+	for _, members := range allData {
+		for _, member := range members {
+			iterant := 0
+			if member.ParentID == nil {
+				continue
+			}
+			parent := member.ParentID
+			ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
+
+			totalBonus[member.UserID] += parent.MatchingBonus
+		}
+	}
+	for _, members := range allData {
+		for _, member := range members {
+			totalBonus[member.UserID] = member.MatchingBonus
+			fmt.Println(member.MatchingBonus)
+		}
+	}
+	return totalBonus
+}
+
+func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPercentages []float64, iterant int, cappingAmount float64, cappingScope string) {
+	if iterant >= len(matchingPercentages) || parent == nil {
+		return
+	}
+	matching_bonus := parent.MatchingBonus
+	matching_bonus = matching_bonus + (member.BinaryBonus * matchingPercentages[iterant] / 100)
+	if cappingScope == "matching" && parent.MatchingBonus > cappingAmount {
+		parent.MatchingBonus = cappingAmount
+	} else {
+		parent.MatchingBonus = matching_bonus
+	}
+	iterant = iterant + 1
+	parent = parent.ParentID
+	ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
 
 func sendResultsToDjango(results interface{}) {
@@ -417,12 +467,9 @@ func main() {
 			http.Error(w, "Invalid or missing 'ratio_amount' field", http.StatusBadRequest)
 			return
 		}
-		//var treeNodes []*TreeStructure
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
 		result := buildTree(root, int(numMembers), 2, floatData)
-		// for _, tree := range result {
-		// 	treeNodes = append(treeNodes, tree)
-		// }
+
 		stored_id, cycleCount, all_data := AllocateMembers(int(numMembers), intData, 2, result, floatData)
 		var cycleList [][]*TreeStructure
 		for _, list := range all_data {
@@ -441,58 +488,45 @@ func main() {
 					CarryForward:        member.CarryForward,
 					LeftMember:          member.LeftMember,
 					RightMember:         member.RightMember,
+					LeftCarry:           member.LeftCarry,
+					RightCarry:          member.RightCarry,
+					LeftDownlineSale:    member.LeftDownlineSale,
+					RightDownlineSale:   member.RightDownlineSale,
 				}
-				if copiedMember.LeftMember != nil{
-					if copiedMember.LeftMember.UserID > len(list){
+				if copiedMember.LeftMember != nil {
+					if copiedMember.LeftMember.UserID > len(list) {
 						copiedMember.LeftMember = nil
 					}
 				}
-				if copiedMember.RightMember != nil{
-					if copiedMember.RightMember.UserID > len(list){
+				if copiedMember.RightMember != nil {
+					if copiedMember.RightMember.UserID > len(list) {
 						copiedMember.RightMember = nil
 					}
 				}
 				copiedMembers = append(copiedMembers, copiedMember)
 			}
-			for _, member := range copiedMembers{
-				if member.ParentID != nil{
+			for _, member := range copiedMembers {
+				if member.ParentID != nil {
 					member.ParentID = copiedMembers[member.ParentID.UserID-1]
 				}
 			}
 			cycleList = append(cycleList, copiedMembers)
 		}
+
 		totalSponsorBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, floatData, cappingAmount, cappingScope, int(numMembers))
 		totalBinaryBonus := BinaryWithRatio(cycleList, floatData, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount)
+
 		totalMatchingBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		cycle := 1
 		for _, list := range cycleList {
-			fmt.Println(cycle)
 			for _, member := range list {
-				fmt.Println(member.UserID, member.MatchingBonus)
+				fmt.Println(member.MatchingBonus)
 			}
-			cycle = cycle + 1
 		}
-		// var temp []TreeStructureJSON
-		// var all_data_json [][]TreeStructureJSON
-		// for _, list := range all_data {
-		// 	temp = convertToJSONStructure(list)
-		// 	all_data_json = append(all_data_json, temp)
-		// }
-		// cycle := 1
-		// for _, list := range cycleList {
-		// 	fmt.Println(cycle)
-		// 	for _, member := range list {
-		// 		fmt.Println("userid,binarybonus,sponsorbonus", member.UserID, member.BinaryBonus, member.SponsorBonus)
-		// 	}
-		// 	cycle = cycle + 1
-		// }
 		results := map[string]interface{}{
-			// "tree_structure":      convertToJSONStructure(treeNodes),
-			"stored_id":           stored_id,
-			"cycleCount":          cycleCount,
-			//"all_data":            cycleList,
-			"total_sponsor_bonus": totalSponsorBonus,
-			"total_binary_bonus":  totalBinaryBonus,
+			"stored_id":            stored_id,
+			"cycleCount":           cycleCount,
+			"total_sponsor_bonus":  totalSponsorBonus,
+			"total_binary_bonus":   totalBinaryBonus,
 			"total_matching_bonus": totalMatchingBonus,
 		}
 		sendResultsToDjango(results)
@@ -505,37 +539,28 @@ func main() {
 	log.Fatal(http.ListenAndServe(":9000", nil))
 }
 
-func CalculateMatchingBonus(cycleList [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) float64 {
-	var totalBonus float64
-	for _, list := range cycleList {
-		for _, member := range list{
-			iterant := 0
-			if member.ParentID == nil {
-				continue
-			}
-			parent := member.ParentID
-			ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
-			}
-	}
+// func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) map[int]float64 {
+// 	// var totalBonus float64
+// 	var totalBonus map[int]float64
 
-	// for _, member := range members {
-	// 	totalBonus += member.MatchingBonus
-	// }
-	return totalBonus
-}
+// 	for _, members := range allData {
+// 		for _, member := range members {
+// 			iterant := 0
+// 			if member.ParentID == nil {
+// 				continue
+// 			}
+// 			parent := member.ParentID
+// 			ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 
-func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPercentages []float64, iterant int, cappingAmount float64, cappingScope string) {
-	if iterant >= len(matchingPercentages) || parent == nil {
-		return
-	}
-	matching_bonus := parent.MatchingBonus
-	matching_bonus = matching_bonus + (member.BinaryBonus * matchingPercentages[iterant] / 100)
-	if cappingScope == "matching" && parent.MatchingBonus > cappingAmount {
-		parent.MatchingBonus = cappingAmount
-	} else {
-		parent.MatchingBonus = matching_bonus
-	}
-	iterant = iterant + 1
-	parent = parent.ParentID
-	ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
-}
+// 			totalBonus[member.UserID] += parent.MatchingBonus
+// 		}
+// 	}
+// 	for _, members := range allData {
+// 		for _, member := range members {
+// 			totalBonus[uid] = member.MatchingBonus
+// 			fmt.Println(member.MatchingBonus)
+// 		}
+// 	}
+// 	fmt.Println(">>>>>", totalBonus)
+// 	return totalBonus
+// }

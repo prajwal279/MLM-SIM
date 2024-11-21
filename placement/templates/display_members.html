@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Tree Structure</h1>
-    {% comment %} {% for cycle, nodes in results.cycles.items %} {% endcomment %}
+
         <h2>Cycle {{cycle}}</h2>
         <table border="1">
             <tr>
@@ -15,7 +15,6 @@
                 <th>Parent ID</th>
                 <th>Position</th>
                 <th>Level</th>
-            
                 <th>Sponsor Bonus</th>
                 <th>Binary Bonus</th>
                 <th>Matching Bonus</th>
@@ -33,7 +32,6 @@
                     <td>{{ node.carry_forward }}</td>
                 </tr>
             {% endfor %}
-    {% comment %} {% endfor %} {% endcomment %}
     </table>
     <br>
     <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
