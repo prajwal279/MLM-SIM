@@ -100,7 +100,6 @@ var treeNodes []*TreeStructure
 
 func buildTree(root *TreeStructure, numMembers int, startID int, joining_package_fee []float64) []*TreeStructure {
 	if numMembers <= 0 {
-		//fmt.Println("Invalid input: numMembers or cycles is non-positive")
 		return nil
 	}
 
@@ -325,7 +324,6 @@ func BinaryWithRatio(allData [][]TreeStructure, joining_package_fee []float64, b
 
 			leftTemp := int(math.Floor(float64(node.LeftDownlineSale) / float64(left)))
 			rightTemp := int(math.Floor(float64(node.RightDownlineSale) / float64(right)))
-
 			noOfPairs = int(math.Min(float64(leftTemp), float64(rightTemp)))
 			carryLeft = int(node.LeftDownlineSale) - noOfPairs*left
 			carryRight = int(node.RightDownlineSale) - noOfPairs*right
@@ -333,7 +331,6 @@ func BinaryWithRatio(allData [][]TreeStructure, joining_package_fee []float64, b
 			node.LeftCarry = carryLeft
 			node.RightCarry = carryRight
 			minimumVal := int(math.Min(float64(noOfPairs*left), float64(noOfPairs*right)))
-
 			var bonusPerc int
 			switch {
 			case noOfPairs > 0 && noOfPairs <= 5:
@@ -361,17 +358,17 @@ func BinaryWithRatio(allData [][]TreeStructure, joining_package_fee []float64, b
 }
 
 func sendResultsToDjango(results interface{}) {
-	//fmt.Println("results: ",results)
 	jsonData, err := json.Marshal(results)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	resp, err := http.Post("http://localhost:8000/process_results/", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	//fmt.Println("Response from Django:", resp.Status)
+	fmt.Println("Response from Django:", resp.Status)
 }
 
 func main() {
@@ -382,7 +379,7 @@ func main() {
 			return
 		}
 
-		//fmt.Println("Received data:", data)
+		fmt.Println("Received data:", data)
 
 		numMembers, ok := data["num_members"].(float64)
 		if !ok {
@@ -395,6 +392,7 @@ func main() {
 			return
 		}
 		floatData := make([]float64, 0)
+		percData := make([]float64, 0)
 		var intData []int
 		// matchingPercentages, ok := data["joining_package_fee"].([]interface{})
 		// if !ok {
@@ -458,7 +456,6 @@ func main() {
 		}
 		//var treeNodes []*TreeStructure
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
-		fmt.Println("#############start###############")
 		result := buildTree(root, int(numMembers), 2, floatData)
 		// for _, tree := range result {
 		// 	treeNodes = append(treeNodes, tree)
