@@ -9,6 +9,7 @@ def build_new_tree(request):
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
+            print("<<<<<<>>>>>>>>>")
             num_members = form.cleaned_data['num_members']
             sponsor_bonus_percent = form.cleaned_data['sponsor_bonus_percent']
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
@@ -16,7 +17,7 @@ def build_new_tree(request):
             product_quantity = [int(level.strip()) for level in form.cleaned_data.get('product_quantity', '').split(",") if level.strip().isdigit()]
             capping_limit = form.cleaned_data['capping_limit']
             capping_scope = form.cleaned_data['capping_scope']
-            carry_yes_no = form.cleaned_data['carry_yes_no']
+            # carry_yes_no = form.cleaned_data['carry_yes_no']
             matching_bonus_percents = [int(level.strip()) for level in form.cleaned_data.get('matching_bonus_percent', '').split(",") if level.strip().isdigit()]
             cycle = form.cleaned_data['cycle']
             ratio = form.cleaned_data['ratio']
@@ -38,9 +39,7 @@ def build_new_tree(request):
                 response = requests.post('http://localhost:9000/calculate', json=data)
                 response.raise_for_status() 
 
-                results = response.json()
-                    
-                print(results)
+                results = response.json()  
                 return render(request, 'display_members.html', {
                     'results': results,
                 })
@@ -48,10 +47,10 @@ def build_new_tree(request):
                 return JsonResponse({'error': f'Failed to communicate with Go server: {str(e)}'}, status=500)
 
         else:
-            return render(request, 'input.html', {'form': form})
+            return render(request, 'interface.html', {'form': form})
     else:
         form = MemberForm()  
-        return render(request, 'input.html', {'form': form})
+        return render(request, 'interface.html', {'form': form})
 
 @csrf_exempt
 def process_results(request):

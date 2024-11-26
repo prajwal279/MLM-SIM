@@ -18,55 +18,53 @@
     {{results.treeNodes.user_id}}
     {% endfor %}
     {% comment %} {% for i in results.cycleCount %} {% endcomment %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Position</th>
-                    <th>Parent ID</th>
-                    <th>Joining Package Fee</th>
-                    <th>Left Member</th>
-                    <th>Right Member</th>
-                    <th>Level</th>
-                    <th>Sponsor Bonus</th>
-                    <th>Binary Bonus</th>
-                    <th>Matching Bonus</th>
-                    <th>Carry Forward</th>
-                    <th>cycle</th>
-                    <th>flushout</th>
-                    <th>Left Carry </th>
-                    <th>Right Carry </th>
-                    <th>Left Downline Sale </th>
-                    <th>Right Downline Sale </th> 
-                </tr>
-            </thead>
-            <tbody>
-            {% for list in results.treeNodes %}
-                {{treeNodes.cycleCount}}
-                {% for node in list %}
-                <tr>
-                    <td>{{node.user_id}}</td>
-                    <td>{{node.position}}</td>
-                    <td>{{node.parent_id}}</td>
-                    <td>{{node.joining_package_fee}}</td>
-                    <td>{{node.left_member}}</td>
-                    <td>{{node.right_member}}</td>
-                    <td>{{node.levels}}</td>
-                    <td>{{node.sponsor_bonus}}</td>
-                    <td>{{node.binary_bonus}}</td>
-                    <td>{{node.matching_bonus}}</td>
-                    <td>{{node.carry_forward}}</td>
-                    <td>{{node.cycle}}</td>
-                    <td>{{node.flush_out}}</td>
-                    <td>{{node.left_carry}}</td>
-                    <td>{{node.right_carry}}</td>
-                    <td>{{node.LeftDownlineSale}}</td>
-                    <td>{{node.RightDownlineSale}}</td> 
-                </tr>   
-                {% endfor %}
-            {% endfor %}
-            </tbody>
-        </table> 
+    {% for list in results.treeNodes %}
+    {{list.cycleCount}}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Position</th>
+                <th>Parent ID</th>
+                <th>Joining Package Fee</th>
+                <th>Left Member</th>
+                <th>Right Member</th>
+                <th>Level</th>
+                <th>Sponsor Bonus</th>
+                <th>Binary Bonus</th>
+                <th>Matching Bonus</th>
+                <th>Carry Forward</th>
+                <th>cycle</th>
+                <th>flushout</th>
+                <th>Left Carry </th>
+                <th>Right Carry </th>
+                <th>Left Downline Sale </th>
+                <th>Right Downline Sale </th> 
+            </tr>
+        </thead>
+        {% for node in list %}
+        <tr>
+            <td>{{node.user_id}}</td>
+            <td>{{node.position}}</td>
+            <td>{{node.parent_id}}</td>
+            <td>{{node.joining_package_fee}}</td>
+            <td>{{node.left_member}}</td>
+            <td>{{node.right_member}}</td>
+            <td>{{node.levels}}</td>
+            <td>{{node.sponsor_bonus}}</td>
+            <td>{{node.binary_bonus}}</td>
+            <td>{{node.matching_bonus}}</td>
+            <td>{{node.carry_forward}}</td>
+            <td>{{node.cycle}}</td>
+            <td>{{node.flush_out}}</td>
+            <td>{{node.left_carry}}</td>
+            <td>{{node.right_carry}}</td>
+            <td>{{node.LeftDownlineSale}}</td>
+            <td>{{node.RightDownlineSale}}</td> 
+        </tr>   
+        {% endfor %}
+    </table> 
+    {% endfor %}
 
     <br>
     <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>

@@ -73,7 +73,8 @@
     <h2>MLM Plan Calculator</h2>
      
 
-    <form id="mlmCalculator">
+    <form id="mlmCalculator" method="post">
+        {% csrf_token %}
         <!-- Base Currency -->
         <div class="row g-3">
             <div class="col-md-6">
@@ -141,6 +142,11 @@
                     {% comment %} <input type="text" class="form-control" id="binaryRatio" placeholder="e.g., 1:1"> {% endcomment %}
                 </div>
                 <div class="col-md-4">
+                    <label for="binaryRatio" class="form-label">Ratio</label>
+                    {{ form.ratio_amount }}
+                    {% comment %} <input type="text" class="form-control" id="binaryRatio" placeholder="e.g., 1:1"> {% endcomment %}
+                </div>
+                <div class="col-md-4">
                     <label for="binaryOption" class="form-label">Bonus Option</label>
                     <select id="binaryOption" class="form-select">
                         <option value="price">Price</option>
@@ -166,12 +172,12 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    {{ form.sponsor_bonus_percent }}
+                    
                     {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
                     <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                    {{ form.matching_bonus_percent }}
+                    
                     {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
                 </div>
             </div>
@@ -183,12 +189,12 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    {{ form.sponsor_bonus_percent }}
+                    
                     {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
                     <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                    {{ form.matching_bonus_percent }}
+    
                     {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
                 </div>
             </div>
@@ -223,11 +229,8 @@
                 
                 </div>
             </div>
+        <input type="submit">
     </form>
-    
-    <div class="text-center mt-4">
-        <button type="submit">cal</button>
-    </div>
 </div>
 
 <script>
@@ -313,11 +316,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-

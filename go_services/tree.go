@@ -544,29 +544,3 @@ func main() {
 	})
 	log.Fatal(http.ListenAndServe(":9000", nil))
 }
-
-// func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) float64 {
-// 	var totalBonus float64
-// 	// var totalBonus map[int]float64
-
-// 	for _, members := range allData {
-// 		for _, member := range members {
-// 			iterant := 0
-// 			if member.ParentID == nil {
-// 				continue
-// 			}
-// 			parent := member.ParentID
-// 			ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
-
-// 			totalBonus += parent.MatchingBonus
-// 		}
-// 	}
-// 	for _, members := range allData {
-// 		for _, member := range members {
-// 			totalBonus = member.MatchingBonus
-// 			fmt.Println("efef",totalBonus)
-// 		}
-// 	}
-// 	fmt.Println("efef",totalBonus)
-// 	return totalBonus
-// }

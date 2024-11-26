@@ -24,12 +24,12 @@ class MemberForm(forms.Form):
     ]
     capping_scope = forms.ChoiceField(choices=BONUS_TYPE_CHOICES)
     
-    CARRY_CHOICE = [
-        ('yes','Yes'),
-        ('no','No'),
-    ]
-    carry_yes_no = forms.ChoiceField(choices=CARRY_CHOICE,widget=forms.RadioSelect,label="Carry Forward (Yes or No)",required=True)
-    
+    # CARRY_CHOICE = [
+    #     ('yes','Yes'),
+    #     ('no','No'),
+    # ]
+    # carry_yes_no = forms.ChoiceField(choices=CARRY_CHOICE,widget=forms.RadioSelect,label="Carry Forward (Yes or No)",required=True)
+   
     # def __init__(self, *args, **kwargs):
 
     #     cycles = kwargs.get('cycles', 1) 
