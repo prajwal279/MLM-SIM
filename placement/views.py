@@ -9,15 +9,15 @@ def build_new_tree(request):
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
-            print("<<<<<<>>>>>>>>>")
             num_members = form.cleaned_data['num_members']
             sponsor_bonus_percent = form.cleaned_data['sponsor_bonus_percent']
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
             joining_package_fee = [int(level.strip()) for level in form.cleaned_data.get('joining_package_fee', '').split(",") if level.strip().isdigit()]
+            b_volume = [int(level.strip()) for level in form.cleaned_data.get('b_v', '').split(",") if level.strip().isdigit()]
+            bonus_option = form.cleaned_data['bonus_option']
             product_quantity = [int(level.strip()) for level in form.cleaned_data.get('product_quantity', '').split(",") if level.strip().isdigit()]
             capping_limit = form.cleaned_data['capping_limit']
             capping_scope = form.cleaned_data['capping_scope']
-            # carry_yes_no = form.cleaned_data['carry_yes_no']
             matching_bonus_percents = [int(level.strip()) for level in form.cleaned_data.get('matching_bonus_percent', '').split(",") if level.strip().isdigit()]
             cycle = form.cleaned_data['cycle']
             ratio = form.cleaned_data['ratio']
@@ -27,6 +27,8 @@ def build_new_tree(request):
                 "sponsor_percentage": sponsor_bonus_percent,
                 "binary_percentage": binary_bonus_percent,
                 "joining_package_fee": joining_package_fee,
+                "b_volume" : b_volume,
+                "bonus_option": bonus_option,
                 "product_quantity": product_quantity,
                 "capping_amount": capping_limit,
                 "capping_scope": capping_scope,

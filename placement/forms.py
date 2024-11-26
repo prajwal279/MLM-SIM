@@ -3,12 +3,26 @@ from django import forms
 class MemberForm(forms.Form):
     num_members=forms.IntegerField(label="No Of Members",min_value=1)
     joining_package_fee = forms.CharField(max_length=255, required=False)
+    b_v = forms.CharField(max_length=255, required=False)   
     sponsor_bonus_percent = forms.FloatField(label="Sponsor Bonus (%)", min_value=0)
     binary_bonus_percent = forms.FloatField(label="Binary Bonus (%)", min_value=0)
     matching_bonus_percent = forms.CharField(max_length=255, required=False)
     product_quantity = forms.CharField(max_length=255, required=False)
     capping_limit = forms.FloatField(label="Capping Limit", min_value=0)
-    cycle = forms.IntegerField(label="No of Cycles",min_value=1)
+    
+    BONUS_TYPE = [
+        ('PRICE','joining_package_fee'),
+        ('BV','BV'),
+    ]
+    bonus_option = forms.ChoiceField(choices=BONUS_TYPE, label="BonusOption", required=True)
+    
+    # cycle = forms.IntegerField(label="No of Cycles",min_value=1)
+    CYCLE_COUNT = [
+        ('S', 'weakly'),
+        ('M', 'monthly'),
+        ('Y', 'yearly'),
+    ]
+    cycle = forms.ChoiceField(choices=CYCLE_COUNT, label="Cycle", required=True)
     
     RATIO_CHOICES = [
         (1, '1:1'),

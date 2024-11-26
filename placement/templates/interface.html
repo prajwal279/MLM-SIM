@@ -123,6 +123,11 @@
                     {{ form.product_quantity }}                                           
                     <label for="productQuantity" class="form-label small text-muted">Quantity</label>
                 </div>
+                <div class="col-md-3">
+                    {% comment %} <input type="number" class="form-control" id="productQuantity" placeholder="Quantity"> {% endcomment %}
+                    {{ form.b_v }}                                          
+                    <label for="productQuantity" class="form-label small text-muted">BV</label>
+                </div>
                
             </div>
         </div>
@@ -142,16 +147,13 @@
                     {% comment %} <input type="text" class="form-control" id="binaryRatio" placeholder="e.g., 1:1"> {% endcomment %}
                 </div>
                 <div class="col-md-4">
-                    <label for="binaryRatio" class="form-label">Ratio</label>
+                    <label for="binaryRatio" class="form-label">Ratio Amount</label>
                     {{ form.ratio_amount }}
                     {% comment %} <input type="text" class="form-control" id="binaryRatio" placeholder="e.g., 1:1"> {% endcomment %}
                 </div>
                 <div class="col-md-4">
                     <label for="binaryOption" class="form-label">Bonus Option</label>
-                    <select id="binaryOption" class="form-select">
-                        <option value="price">Price</option>
-                        <option value="bv">BV</option>
-                    </select>
+                    {{ form.bonus_option }}
                 </div>
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
@@ -209,7 +211,7 @@
                     {% comment %} <input type="number" class="form-control" id="cappingLimit" placeholder="Enter amount"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Capping Scope</label>
+                    <label class="form-label"> Capping Scope </label>
                     {{ form.capping_scope }}
                     {% comment %} <div class="d-flex">
                         <div class="form-check me-3">

@@ -12,7 +12,7 @@
 
     {% comment %} <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
     <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
-    <tr><td>Total Matching Bonus:</td><td> {{results.total_matching_bonus }} INR</td></tr><br>
+    
     <tr><td>stored Id:</td><td> {{results.stored_id }} </td></tr><br> {% endcomment %}
     {% for list in results.treeNodes %}
     {{results.treeNodes.user_id}}
@@ -27,6 +27,7 @@
                 <th>Position</th>
                 <th>Parent ID</th>
                 <th>Joining Package Fee</th>
+                <th>Business Volume</th>
                 <th>Left Member</th>
                 <th>Right Member</th>
                 <th>Level</th>
@@ -34,8 +35,6 @@
                 <th>Binary Bonus</th>
                 <th>Matching Bonus</th>
                 <th>Carry Forward</th>
-                <th>cycle</th>
-                <th>flushout</th>
                 <th>Left Carry </th>
                 <th>Right Carry </th>
                 <th>Left Downline Sale </th>
@@ -48,6 +47,7 @@
             <td>{{node.position}}</td>
             <td>{{node.parent_id}}</td>
             <td>{{node.joining_package_fee}}</td>
+            <td>{{node.bv}}</td>
             <td>{{node.left_member}}</td>
             <td>{{node.right_member}}</td>
             <td>{{node.levels}}</td>
@@ -55,8 +55,6 @@
             <td>{{node.binary_bonus}}</td>
             <td>{{node.matching_bonus}}</td>
             <td>{{node.carry_forward}}</td>
-            <td>{{node.cycle}}</td>
-            <td>{{node.flush_out}}</td>
             <td>{{node.left_carry}}</td>
             <td>{{node.right_carry}}</td>
             <td>{{node.LeftDownlineSale}}</td>
@@ -69,5 +67,6 @@
     <br>
     <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
     <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
+    <tr><td>Total Matching Bonus:</td><td> {{results.total_matching_bonus }} INR</td></tr><br>
 </body>
 </html>
