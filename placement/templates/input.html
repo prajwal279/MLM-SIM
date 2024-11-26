@@ -3,5 +3,274 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">cal</button>
-</form>
+</form> 
+
+
+
+{% comment %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLM Plan Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f4f5f7;
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        h2 {
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #5a67d8;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .btn-group {
+            width: 100%;
+        }
+        .btn-group .btn {
+            flex: 1;
+        }
+        .btn-primary {
+            background-color: #5a67d8;
+            border-color: #5a67d8;
+        }
+        .btn-primary:hover {
+            background-color: #434cb0;
+            border-color: #434cb0;
+        }
+        .btn-outline-primary {
+            color: #5a67d8;
+            border-color: #5a67d8;
+        }
+        .btn-outline-primary:hover {
+            background-color: #5a67d8;
+            color: #fff;
+        }
+        .plan-card {
+            display: none;
+            padding: 20px;
+            border: 1px solid #e3e6ea;
+            border-radius: 10px;
+            background-color: #f9fafb;
+            margin-top: 20px;
+        }
+        .plan-card.active {
+            display: block;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section h5 {
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+        .form-section .form-label {
+            margin-bottom: 5px;
+        }
+        .submit-section {
+            text-align: center;
+        }
+        .submit-section button {
+            background-color: #48bb78;
+            border-color: #48bb78;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+        .submit-section button:hover {
+            background-color: #38a169;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>MLM Plan Calculator</h2>
+    <form id="mlmCalculator">
+        <div class="form-section">
+            <h5>General Details</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="numMembers" class="form-label">No of Members</label>
+                    {{ form.num_members }}
+                </div>
+                <div class="col-md-6">
+                    <label for="cycle" class="form-label">Cycle</label>
+                    {{ form.cycle }}
+                </div>
+                <div class="col-md-4">
+                    <label for="baseCurrency" class="form-label">Base Currency</label>
+                    <select id="baseCurrency" class="form-select">
+                        <option value="USD">USD</option>
+                        <option value="EURO">EURO</option>
+                        <option value="INR">INR</option>
+                        <option value="AED">AED</option>
+                        <option value="HKD">HKD</option>
+                    </select>
+                </div>
+            </div>
+            <div class="container mt-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="productName" placeholder="Enter product name">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productPrice" class="form-label small text-muted">Price</label>
+                        {{ form.joining_package_fee }}
+                    </div>
+                    <div class="col-md-5">
+                        <label for="productBV" class="form-label small text-muted">Business Volume</label>
+                        {{ form.joining_package_fee }}
+                    </div>
+                    <div class="col-md-5">
+                        <label for="productQuantity" class="form-label small text-muted">Quantity</label>
+                        {{ form.product_quantity }}
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+
+
+        <div class="form-section">
+            <h5>Select Plan</h5>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary" id="binaryBtn">BINARY MLM</button>
+                <button type="button" class="btn btn-outline-primary" id="unilevelBtn">UNILEVEL MLM</button>
+                <button type="button" class="btn btn-outline-primary" id="matrixBtn">MATRIX MLM</button>
+            </div>
+        </div>
+
+        <div id="binaryForm" class="plan-card">
+            <h5>Binary Plan</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="binaryBonusPercent" class="form-label">Binary Bonus (%)</label>
+                    {{ form.binary_bonus_percent }}
+                </div>
+                <div class="col-md-6">
+                    <label for="binaryRatio" class="form-label">Ratio</label>
+                    {{ form.ratio }}
+                </div>
+            </div>
+        </div>
+
+        <div id="unilevelForm" class="plan-card">
+            <h5>Unilevel Plan</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="unilevelBonus" class="form-label">Sponsor Bonus (%)</label>
+                    {{ form.sponsor_bonus_percent }}
+                </div>
+                <div class="col-md-6">
+                    <label for="unilevelMatchingBonus" class="form-label">Matching Bonus (%)</label>
+                    {{ form.matching_bonus_percent }}
+                </div>
+            </div>
+        </div>
+
+        <div id="matrixForm" class="plan-card">
+            <h5>Matrix Plan</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="matrixBonus" class="form-label">Sponsor Bonus (%)</label>
+                    {{ form.sponsor_bonus_percent }}
+                </div>
+                <div class="col-md-6">
+                    <label for="matrixMatchingBonus" class="form-label">Matching Bonus (%)</label>
+                    {{ form.matching_bonus_percent }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+         
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="cappingLimit" class="form-label">Capping Limit</label>
+                    {{ form.capping_limit }}
+                </div>
+                <div class="col-md-6">
+                    <label for="cappingScope" class="form-label">Capping Scope</label>
+                    {{ form.capping_scope }}
+                </div>
+            </div>
+        </div>
+
+        <div class="submit-section mt-4">
+            <button type="submit" class="btn btn-success">Calculate</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('binaryBtn').addEventListener('click', () => toggleForms('binaryForm'));
+    document.getElementById('unilevelBtn').addEventListener('click', () => toggleForms('unilevelForm'));
+    document.getElementById('matrixBtn').addEventListener('click', () => toggleForms('matrixForm'));
+
+    function toggleForms(activeForm) {
+        ['binaryForm', 'unilevelForm', 'matrixForm'].forEach(formId => {
+            document.getElementById(formId).classList.remove('active');
+        });
+        document.getElementById(activeForm).classList.add('active');
+    }
+    document.getElementById('addProductBtn').addEventListener('click', () => {
+        const productSection = document.getElementById('productDetailsSection').querySelector('.product-entry');
+        const newProductRow = productSection.querySelector('.product-row').cloneNode(true); // Clone the first product row
+        productSection.appendChild(newProductRow); // Append new product row
+
+        // Optional: Reset values in the new product row to blank
+        const inputs = newProductRow.querySelectorAll('input');
+        inputs.forEach(input => input.value = '');
+    });
+
+    document.getElementById('binaryBtn').addEventListener('click', () => toggleForms('binaryForm'));
+    document.getElementById('unilevelBtn').addEventListener('click', () => toggleForms('unilevelForm'));
+    document.getElementById('matrixBtn').addEventListener('click', () => toggleForms('matrixForm'));
+
+    function toggleForms(activeForm) {
+        ['binaryForm', 'unilevelForm', 'matrixForm'].forEach(formId => {
+            document.getElementById(formId).classList.remove('active');
+        });
+        document.getElementById(activeForm).classList.add('active');
+    }
+</script>
+
+</body>
+
+</html>  {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -71,6 +71,8 @@
 
 <div class="container">
     <h2>MLM Plan Calculator</h2>
+     
+
     <form id="mlmCalculator">
         <!-- Base Currency -->
         <div class="row g-3">
@@ -91,6 +93,14 @@
                     <button type="button" class="btn btn-primary" id="matrixBtn">MATRIX MLM</button>
                 </div>
             </div>
+            <div class="col-md-6">
+                <label for="numMembers" class="form-label">No of Members</label>
+                {{ form.num_members }}
+            </div>
+            <div class="col-md-6">
+                <label for="cycle" class="form-label">Cycle</label>
+                {{ form.cycle }}
+            </div>
         </div>
 
         <!-- Product Data Fields -->
@@ -102,35 +112,33 @@
             </div>
             <div class="row g-3">
                 <div class="col-md-3">
-                    <input type="number" class="form-control" id="productPrice" placeholder="Price">
+                    {% comment %} <input type="number" class="form-control" id="productPrice" placeholder="Price"> {% endcomment %}
+                    {{ form.joining_package_fee }}
                     <label for="productPrice" class="form-label small text-muted">Price</label>
                 </div>
+                
                 <div class="col-md-3">
-                    <input type="number" class="form-control" id="productBV" placeholder="BV">
-                    <label for="productBV" class="form-label small text-muted">Business Volume</label>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" class="form-control" id="productQuantity" placeholder="Quantity">
+                    {% comment %} <input type="number" class="form-control" id="productQuantity" placeholder="Quantity"> {% endcomment %}
+                    {{ form.product_quantity }}                                           
                     <label for="productQuantity" class="form-label small text-muted">Quantity</label>
                 </div>
-                <div class="col-md-3">
-                    <input type="number" class="form-control" id="productCycle" placeholder="Cycle">
-                    <label for="productCycle" class="form-label small text-muted">Cycle</label>
-                </div>
+               
             </div>
         </div>
-
+        
         <!-- Binary Form Fields -->
         <div id="binaryForm" class="plan-card hidden mt-4">
             <h5>BINARY MLM Plan</h5>
             <div class="row g-3">
                 <div class="col-md-4">
                     <label for="binaryPercentage" class="form-label">Binary %</label>
-                    <input type="number" class="form-control" id="binaryPercentage" placeholder="Binary %">
+                    {{ form.binary_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="binaryPercentage" placeholder="Binary %"> {% endcomment %}
                 </div>
                 <div class="col-md-4">
                     <label for="binaryRatio" class="form-label">Ratio</label>
-                    <input type="text" class="form-control" id="binaryRatio" placeholder="e.g., 1:1">
+                    {{ form.ratio }}
+                    {% comment %} <input type="text" class="form-control" id="binaryRatio" placeholder="e.g., 1:1"> {% endcomment %}
                 </div>
                 <div class="col-md-4">
                     <label for="binaryOption" class="form-label">Bonus Option</label>
@@ -141,11 +149,13 @@
                 </div>
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %">
+                    {{ form.sponsor_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
                     <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                    <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %">
+                    {{ form.matching_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
                 </div>
             </div>
         </div>
@@ -155,12 +165,14 @@
             <h5>UNILEVEL MLM Plan</h5>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="unilevelPercentage" class="form-label">Unilevel %</label>
-                    <input type="number" class="form-control" id="unilevelPercentage" placeholder="Unilevel %">
+                    <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
+                    {{ form.sponsor_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
-                    <label for="unilevelSponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    <input type="number" class="form-control" id="unilevelSponsorBonus" placeholder="Sponsor Bonus %">
+                    <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
+                    {{ form.matching_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
                 </div>
             </div>
         </div>
@@ -170,12 +182,14 @@
             <h5>MATRIX MLM Plan</h5>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="matrixPercentage" class="form-label">Matrix %</label>
-                    <input type="number" class="form-control" id="matrixPercentage" placeholder="Matrix %">
+                    <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
+                    {{ form.sponsor_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
-                    <label for="matrixSponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    <input type="number" class="form-control" id="matrixSponsorBonus" placeholder="Sponsor Bonus %">
+                    <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
+                    {{ form.matching_bonus_percent }}
+                    {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
                 </div>
             </div>
         </div>
@@ -185,11 +199,13 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="cappingLimit" class="form-label">Capping Limit (Amount)</label>
-                    <input type="number" class="form-control" id="cappingLimit" placeholder="Enter amount">
+                    {{ form.capping_limit }}
+                    {% comment %} <input type="number" class="form-control" id="cappingLimit" placeholder="Enter amount"> {% endcomment %}
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Capping Scope</label>
-                    <div class="d-flex">
+                    {{ form.capping_scope }}
+                    {% comment %} <div class="d-flex">
                         <div class="form-check me-3">
                             <input class="form-check-input" type="checkbox" id="binaryBonus" value="Binary Bonus">
                             <label class="form-check-label" for="binaryBonus">Binary Bonus</label>
@@ -202,14 +218,15 @@
                             <input class="form-check-input" type="checkbox" id="matchingBonusScope" value="Matching Bonus">
                             <label class="form-check-label" for="matchingBonusScope">Matching Bonus</label>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
                 
                 </div>
             </div>
     </form>
+    
     <div class="text-center mt-4">
-        <button type="button" class="btn btn-success" id="simulateBtn">Simulate Calculation</button>
+        <button type="submit">cal</button>
     </div>
 </div>
 
@@ -296,3 +313,11 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+

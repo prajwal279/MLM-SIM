@@ -21,7 +21,6 @@ class MemberForm(forms.Form):
         ('binary', 'Binary Bonus'),
         ('matching', 'Matching Bonus'),
         ('sponsor', 'Sponsor Bonus'),
-        ('total', 'Total Bonus'),
     ]
     capping_scope = forms.ChoiceField(choices=BONUS_TYPE_CHOICES)
     

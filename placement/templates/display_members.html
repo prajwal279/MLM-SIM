@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,31 +10,64 @@
 <body>
     <h1>Tree Structure</h1>
 
-        <h2>Cycle {{cycle}}</h2>
+    {% comment %} <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
+    <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
+    <tr><td>Total Matching Bonus:</td><td> {{results.total_matching_bonus }} INR</td></tr><br>
+    <tr><td>stored Id:</td><td> {{results.stored_id }} </td></tr><br> {% endcomment %}
+    {% for list in results.treeNodes %}
+    {{results.treeNodes.user_id}}
+    {% endfor %}
+    {% comment %} {% for i in results.cycleCount %} {% endcomment %}
         <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>Parent ID</th>
-                <th>Position</th>
-                <th>Level</th>
-                <th>Sponsor Bonus</th>
-                <th>Binary Bonus</th>
-                <th>Matching Bonus</th>
-                <th>Carry Forward</th>
-            </tr>
-            {% for node in results.tree_structure %}
+            <thead>
                 <tr>
-                    <td>{{ node.user_id }}</td>
-                    <td>{{ node.parentid|default:"NULL" }}</td>
-                    <td>{{ node.position|default:"NULL" }}</td>
-                    <td>{{ node.levels }}</td>
-                    <td>{{ node.sponsor_bonus }}</td>
-                    <td>{{ node.binary_bonus }}</td>
-                    <td>{{ node.matching_bonus }}</td>
-                    <td>{{ node.carry_forward }}</td>
+                    <th>ID</th>
+                    <th>Position</th>
+                    <th>Parent ID</th>
+                    <th>Joining Package Fee</th>
+                    <th>Left Member</th>
+                    <th>Right Member</th>
+                    <th>Level</th>
+                    <th>Sponsor Bonus</th>
+                    <th>Binary Bonus</th>
+                    <th>Matching Bonus</th>
+                    <th>Carry Forward</th>
+                    <th>cycle</th>
+                    <th>flushout</th>
+                    <th>Left Carry </th>
+                    <th>Right Carry </th>
+                    <th>Left Downline Sale </th>
+                    <th>Right Downline Sale </th> 
                 </tr>
+            </thead>
+            <tbody>
+            {% for list in results.treeNodes %}
+                {{treeNodes.cycleCount}}
+                {% for node in list %}
+                <tr>
+                    <td>{{node.user_id}}</td>
+                    <td>{{node.position}}</td>
+                    <td>{{node.parent_id}}</td>
+                    <td>{{node.joining_package_fee}}</td>
+                    <td>{{node.left_member}}</td>
+                    <td>{{node.right_member}}</td>
+                    <td>{{node.levels}}</td>
+                    <td>{{node.sponsor_bonus}}</td>
+                    <td>{{node.binary_bonus}}</td>
+                    <td>{{node.matching_bonus}}</td>
+                    <td>{{node.carry_forward}}</td>
+                    <td>{{node.cycle}}</td>
+                    <td>{{node.flush_out}}</td>
+                    <td>{{node.left_carry}}</td>
+                    <td>{{node.right_carry}}</td>
+                    <td>{{node.LeftDownlineSale}}</td>
+                    <td>{{node.RightDownlineSale}}</td> 
+                </tr>   
+                {% endfor %}
             {% endfor %}
-    </table>
+            </tbody>
+        </table> 
+
     <br>
     <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
     <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>

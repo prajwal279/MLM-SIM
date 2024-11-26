@@ -15,6 +15,7 @@ def build_new_tree(request):
             joining_package_fee = [int(level.strip()) for level in form.cleaned_data.get('joining_package_fee', '').split(",") if level.strip().isdigit()]
             product_quantity = [int(level.strip()) for level in form.cleaned_data.get('product_quantity', '').split(",") if level.strip().isdigit()]
             capping_limit = form.cleaned_data['capping_limit']
+            capping_scope = form.cleaned_data['capping_scope']
             carry_yes_no = form.cleaned_data['carry_yes_no']
             matching_bonus_percents = [int(level.strip()) for level in form.cleaned_data.get('matching_bonus_percent', '').split(",") if level.strip().isdigit()]
             cycle = form.cleaned_data['cycle']
@@ -27,7 +28,7 @@ def build_new_tree(request):
                 "joining_package_fee": joining_package_fee,
                 "product_quantity": product_quantity,
                 "capping_amount": capping_limit,
-                "capping_scope": carry_yes_no,
+                "capping_scope": capping_scope,
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
                 "ratio":ratio,
@@ -63,8 +64,8 @@ def process_results(request):
         cycles = data.get('cycles', {})
         nodes = data.get('tree_structure', [])
         context={}
-        context['sponsor_bonus']="sponsor_bonus---"
-        context['binary_bonus']="binary_bonus---"
+        context['sponsor_bonus']="sponsor_bonus"
+        context['binary_bonus']="binary_bonus"
         context['nodes']=nodes
         context['cycles']=cycles
         
