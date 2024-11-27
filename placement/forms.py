@@ -2,6 +2,7 @@ from django import forms
 
 class MemberForm(forms.Form):
     num_members=forms.IntegerField(label="No Of Members",min_value=1)
+    product_name = forms.CharField(max_length=255, required=False)
     joining_package_fee = forms.CharField(max_length=255, required=False)
     b_v = forms.CharField(max_length=255, required=False)   
     sponsor_bonus_percent = forms.FloatField(label="Sponsor Bonus (%)", min_value=0)
@@ -11,18 +12,18 @@ class MemberForm(forms.Form):
     capping_limit = forms.FloatField(label="Capping Limit", min_value=0)
     
     BONUS_TYPE = [
-        ('PRICE','joining_package_fee'),
+        ('PRICE','PRICE'),
         ('BV','BV'),
     ]
-    bonus_option = forms.ChoiceField(choices=BONUS_TYPE, label="BonusOption", required=True)
-    
-    # cycle = forms.IntegerField(label="No of Cycles",min_value=1)
+    bonus_option = forms.ChoiceField(choices=BONUS_TYPE, label="Bonus Option", required=True, widget=forms.Select(attrs={'class': 'form-select', 'id': 'binaryOption'}),)
+
+    cycle = forms.IntegerField(label="No of Cycles",min_value=1)
     CYCLE_COUNT = [
         ('S', 'weakly'),
         ('M', 'monthly'),
         ('Y', 'yearly'),
     ]
-    cycle = forms.ChoiceField(choices=CYCLE_COUNT, label="Cycle", required=True)
+    cycle = forms.ChoiceField(choices=CYCLE_COUNT, label="Cycle", required=True, widget=forms.Select(attrs={'class': 'form-select', 'id': 'CYCLE_COUNT'}))
     
     RATIO_CHOICES = [
         (1, '1:1'),
@@ -36,7 +37,7 @@ class MemberForm(forms.Form):
         ('matching', 'Matching Bonus'),
         ('sponsor', 'Sponsor Bonus'),
     ]
-    capping_scope = forms.ChoiceField(choices=BONUS_TYPE_CHOICES)
+    capping_scope = forms.MultipleChoiceField(choices=BONUS_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Capping Scope" )
     
     # CARRY_CHOICE = [
     #     ('yes','Yes'),

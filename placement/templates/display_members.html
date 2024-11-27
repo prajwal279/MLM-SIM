@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +17,7 @@
     {% endfor %}
     {% comment %} {% for i in results.cycleCount %} {% endcomment %}
     {% for list in results.treeNodes %}
+    <h2>cycle {{forloop.counter}}</h2>
     {{list.cycleCount}}
     <table border="1">
         <thead>

@@ -6,24 +6,27 @@ import requests
 from .forms import MemberForm
 
 def build_new_tree(request):
+    print(request.POST)
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
+            product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = form.cleaned_data['sponsor_bonus_percent']
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
-            joining_package_fee = [int(level.strip()) for level in form.cleaned_data.get('joining_package_fee', '').split(",") if level.strip().isdigit()]
-            b_volume = [int(level.strip()) for level in form.cleaned_data.get('b_v', '').split(",") if level.strip().isdigit()]
+            joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
+            b_volume = [int(level.strip()) for level in request.POST.getlist('b_v', '') if level.strip().isdigit()]
             bonus_option = form.cleaned_data['bonus_option']
-            product_quantity = [int(level.strip()) for level in form.cleaned_data.get('product_quantity', '').split(",") if level.strip().isdigit()]
+            product_quantity = [int(level.strip()) for level in request.POST.getlist('product_quantity', '') if level.strip().isdigit()]
             capping_limit = form.cleaned_data['capping_limit']
-            capping_scope = form.cleaned_data['capping_scope']
-            matching_bonus_percents = [int(level.strip()) for level in form.cleaned_data.get('matching_bonus_percent', '').split(",") if level.strip().isdigit()]
+            capping_scope = ','.join(form.cleaned_data['capping_scope'])
+            matching_bonus_percents = [int(level.strip()) for level in request.POST.getlist('matching_bonus_percent', '') if level.strip().isdigit()]
             cycle = form.cleaned_data['cycle']
             ratio = form.cleaned_data['ratio']
             ratio_amount = form.cleaned_data['ratio_amount']
             data = {
                 "num_members": num_members,
+                "product_name": product_name,                                            
                 "sponsor_percentage": sponsor_bonus_percent,
                 "binary_percentage": binary_bonus_percent,
                 "joining_package_fee": joining_package_fee,
@@ -37,6 +40,7 @@ def build_new_tree(request):
                 "ratio":ratio,
                 "ratio_amount":ratio_amount,
             }
+            print(",,",data)
             try:
                 response = requests.post('http://localhost:9000/calculate', json=data)
                 response.raise_for_status() 
