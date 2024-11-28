@@ -1,71 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Structure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: auto;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #000;
+        }
+    </style>
 </head>
 <body>
-    <h1>Tree Structure</h1>
+<div id="myChart" style="width:100%; max-width:600px; height:500px;"></div>
+<div id="mySecondChart" style="width:100%; max-width:600px; height:500px;"></div>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus and Profit Table</title>
+<script>
+// Load Google Charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawCharts);
 
-    {% comment %} <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
-    <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
-    
-    <tr><td>stored Id:</td><td> {{results.stored_id }} </td></tr><br> {% endcomment %}
-    {% for list in results.treeNodes %}
-    {{results.treeNodes.user_id}}
-    {% endfor %}
-    {% comment %} {% for i in results.cycleCount %} {% endcomment %}
-    {% for list in results.treeNodes %}
-    <h2>cycle {{forloop.counter}}</h2>
-    {{list.cycleCount}}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Position</th>
-                <th>Parent ID</th>
-                <th>Joining Package Fee</th>
-                <th>Business Volume</th>
-                <th>Left Member</th>
-                <th>Right Member</th>
-                <th>Level</th>
-                <th>Sponsor Bonus</th>
-                <th>Binary Bonus</th>
-                <th>Matching Bonus</th>
-                <th>Carry Forward</th>
-                <th>Left Carry </th>
-                <th>Right Carry </th>
-                <th>Left Downline Sale </th>
-                <th>Right Downline Sale </th> 
-            </tr>
-        </thead>
-        {% for node in list %}
-        <tr>
-            <td>{{node.user_id}}</td>
-            <td>{{node.position}}</td>
-            <td>{{node.parent_id}}</td>
-            <td>{{node.joining_package_fee}}</td>
-            <td>{{node.bv}}</td>
-            <td>{{node.left_member}}</td>
-            <td>{{node.right_member}}</td>
-            <td>{{node.levels}}</td>
-            <td>{{node.sponsor_bonus}}</td>
-            <td>{{node.binary_bonus}}</td>
-            <td>{{node.matching_bonus}}</td>
-            <td>{{node.carry_forward}}</td>
-            <td>{{node.left_carry}}</td>
-            <td>{{node.right_carry}}</td>
-            <td>{{node.LeftDownlineSale}}</td>
-            <td>{{node.RightDownlineSale}}</td> 
-        </tr>   
-        {% endfor %}
-    </table> 
-    {% endfor %}
+function drawCharts() {
 
-    <br>
-    <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
-    <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
-    <tr><td>Total Matching Bonus:</td><td> {{results.total_matching_bonus }} INR</td></tr><br>
+  var totalSponsorBonus = {{results.total_sponsor_bonus}}; 
+  var totalBinaryBonus = {{results.total_binary_bonus}}; 
+  var totalMatchingBonus = {{results.total_matching_bonus}}; 
+
+  
+  const data1 = google.visualization.arrayToDataTable([
+    ['Category', 'Amount'],
+    ['Profit', {{results.totalProfitToCompany}}],
+    ['Expense', {{results.TotalExpense}}]
+  ]);
+
+  const options1 = {
+    title: 'Company Financials',
+    is3D: true,
+    pieSliceText: 'percentage', 
+    slices: {
+      0: {offset: 0.1}, 
+      1: {offset: 0.05} 
+    },
+    fontName: 'Arial',
+    fontSize: 14,
+    chartArea: {width: '90%', height: '80%'}
+  };
+  const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
+  chart1.draw(data1, options1);
+
+  const data2 = google.visualization.arrayToDataTable([
+    ['Bonus Type', 'Amount'],
+    ['Sponsor Bonus', totalSponsorBonus],
+    ['Binary Bonus', totalBinaryBonus],
+    ['Matching Bonus', totalMatchingBonus]
+  ]);
+
+  const options2 = {
+    title: 'Bonus Breakdown',
+    is3D: true,
+    pieSliceText: 'value', 
+    slices: {
+      0: {offset: 0.1, color: 'green'}, 
+      1: {offset: 0.05, color: 'Turquoise'},
+      2: {color: 'Violet'} 
+    },
+    fontName: 'Arial',
+    fontSize: 14,
+    chartArea: {width: '90%', height: '80%'} 
+  };
+  const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));
+  chart2.draw(data2, options2);
+}
+</script>
+
+<table>
+    <tr>
+        <th>No. of Members</th>
+        <td>{{ num_members }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL BINARY BONUS</th>
+        <td>{{ results.total_binary_bonus }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL MATCHING BONUS</th>
+        <td>{{ results.total_matching_bonus }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL PROFIT</th>
+        <td>{{ results.totalProfitToCompany }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL EXPENSE</th>
+        <td>{{ results.TotalExpense }}</td>
+    </tr>
+</table>
+
+
+<table>
+    <tr>
+        <th>TOTAL SPONSOR BONUS</th>
+        <td>{{ results.total_sponsor_bonus }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL BINARY BONUS</th>
+        <td>{{ results.total_binary_bonus }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL MATCHING BONUS</th>
+        <td>{{ results.total_matching_bonus }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL PROFIT</th>
+        <td>{{ results.totalProfitToCompany }}</td>
+    </tr>
+    <tr>
+        <th>TOTAL EXPENSE</th>
+        <td>{{ results.TotalExpense }}</td>
+    </tr>
+</table>
 </body>
 </html>

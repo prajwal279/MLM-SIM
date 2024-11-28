@@ -57,14 +57,58 @@
             border-color: #5a67d8;
             transition: background-color 0.2s;
         }
+        .btn-primary.active {
+            background-color: darkgreen; 
+            border-color: darkgreen;
+        }
         .btn-primary:hover {
-            background-color: #4c51bf;
+            background-color: darkgreen;
             border-color: #4c51bf;
         }
         .btn-success {
             background-color: #48bb78;
             border-color: #48bb78;
         }
+        .delete-btn {
+            background-color: #f44336; 
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f; 
+        }
+
+        .delete-btn:focus {
+            outline: none;
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #ff6f61, #d84b3c);
+            color: white; 
+            font-size: 16px; 
+            padding: 12px 30px; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+          }
+      
+          
+          .submit-btn:hover {
+            background: linear-gradient(135deg, #d84b3c, #ff6f61); 
+            transform: scale(1.05); 
+          }
+          
+          .submit-btn:focus {
+            outline: none; 
+            box-shadow: 0 0 10px rgba(255, 111, 97, 0.6); 
+          }
     </style>
 </head>
 <body>
@@ -75,7 +119,6 @@
 
     <form id="mlmCalculator" method="post">
         {% csrf_token %}
-        <!-- Base Currency -->
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="baseCurrency" class="form-label">Base Currency</label>
@@ -89,7 +132,7 @@
             </div>
             <div class="col-md-6 d-flex align-items-end">
                 <div class="btn-group w-100" role="group">
-                    <button type="button" class="btn btn-primary" id="binaryBtn">BINARY MLM</button>
+                    <button type="button" class="btn btn-primary active" id="binaryBtn">BINARY MLM</button>
                     <button type="button" class="btn btn-primary" id="unilevelBtn">UNILEVEL MLM</button>
                     <button type="button" class="btn btn-primary" id="matrixBtn">MATRIX MLM</button>
                 </div>
@@ -104,9 +147,13 @@
                 {% comment %} <input type="number" class="form-control" id="CYCLE_COUNT" name="cycle" placeholder="No of cycles"> {% endcomment %}
                 {{ form.cycle }}
             </div>
+            <div class="col-md-6">
+                <label for="cycle" class="form-label">Expense per user</label>
+                <input type="number" class="form-control"  name="expense_per_user" placeholder="Enter expense per user">
+                {% comment %} {{ form.expense_per_user }} {% endcomment %}
+            </div>
         </div>
 
-        <!-- Product Data Fields -->
         <div id="productContainer">
             <div class="plan-card mt-4 p-4 product-entry">
                 <div class="row mb-3">
@@ -133,7 +180,6 @@
         <button class="btn btn-primary mt-3" onclick="addProduct()">+ Add Product</button>
 
         
-        <!-- Binary Form Fields -->
         <div id="binaryForm" class="plan-card hidden mt-4">
             <h5>BINARY MLM Plan</h5>
             <div class="row g-3">
@@ -164,96 +210,126 @@
                 <div id="matchingLevel">
                     <div class="col-md-6">
                         <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                        {% comment %} {{ form.matching_bonus_percent }} {% endcomment %}
                         <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
-                        <button class="btn btn-primary mt-3" onclick="addMatching()">Add Matching Bonus Level</button>
                     </div>
                 </div>
+                <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
             </div>
         </div>
 
-        <!-- Unilevel Form Fields -->
         <div id="unilevelForm" class="plan-card hidden mt-4">
             <h5>UNILEVEL MLM Plan</h5>
-            <div class="row g-3">
+            {% comment %} <div class="row g-3">
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    
-                    {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
+                    <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                 </div>
-                <div class="col-md-6">
-                    <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                    
-                    {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
+                <div id="matchingLevel1">
+                    <div class="col-md-6">
+                        <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
+                        <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                    </div>
                 </div>
-            </div>
+                <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
+            </div> {% endcomment %}
         </div>
 
-        <!-- Matrix Form Fields -->
         <div id="matrixForm" class="plan-card hidden mt-4">
             <h5>MATRIX MLM Plan</h5>
-            <div class="row g-3">
+            {% comment %} <div class="row g-3">
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    
-                    {% comment %} <input type="number" class="form-control" id="sponsorBonus" placeholder="Sponsor Bonus %"> {% endcomment %}
+                    <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                 </div>
-                <div class="col-md-6">
-                    <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-    
-                    {% comment %} <input type="number" class="form-control" id="matchingBonus" placeholder="Matching Bonus %"> {% endcomment %}
+                <div id="matchingLevel1">
+                    <div class="col-md-6">
+                        <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
+                        <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                    </div>
                 </div>
-            </div>
+                <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
+            </div> {% endcomment %}
         </div>
-
-        <!-- Capping Limit and Capping Scope -->
+        
         <div class="plan-card mt-4 p-4">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="cappingLimit" class="form-label">Capping Limit (Amount)</label>
-                    {% comment %} {{ form.capping_limit }} {% endcomment %}
                     <input type="number" class="form-control" name="capping_limit" id="cappingLimit" placeholder="Enter amount">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" name="capping_scope" > Capping Scope </label>
                     {{ form.capping_scope }}
                 </div>
-                
-                </div>
             </div>
-        <input type="submit">
+            <input type="submit" value="Simulate" class="submit-btn">
+        {% comment %} <input type="submit"> {% endcomment %}
     </form>
 </div>
 
 <script>
     function addProduct() {
         event.preventDefault(); 
-        // Get the product entry to clone
         const productContainer = document.getElementById('productContainer');
         const newProductEntry = productContainer.firstElementChild.cloneNode(true);
     
-        // Optionally, reset the values of the inputs in the new entry
         newProductEntry.querySelectorAll('input').forEach(input => input.value = '');
-    
-        // Append the new entry to the container
-        productContainer.appendChild(newProductEntry);
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.type = 'button';  
+        deleteButton.classList.add('delete-btn');  
+                deleteButton.addEventListener('click', function() {
+            deleteProductEntry(newProductEntry);  
+        });
+            newProductEntry.appendChild(deleteButton);
+            productContainer.appendChild(newProductEntry);
     }
+    
+    
+    function deleteProductEntry(productEntry) {
+        const productContainer = document.getElementById('productContainer');
+        productContainer.removeChild(productEntry);  
+    }
+    
 
     function addMatching() {
-        event.preventDefault(); 
-        // Get the product entry to clone
+        event.preventDefault();
         const matchingLevel = document.getElementById('matchingLevel');
         const newProductEntry = matchingLevel.firstElementChild.cloneNode(true);
-    
-        // Optionally, reset the values of the inputs in the new entry
         newProductEntry.querySelectorAll('input').forEach(input => input.value = '');
-    
-        // Append the new entry to the container
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.type = 'button';  
+        deleteButton.classList.add('delete-btn');  
+        deleteButton.addEventListener('click', function() {
+            deleteMatchingLevel(newProductEntry); 
+        });
+        newProductEntry.appendChild(deleteButton);
         matchingLevel.appendChild(newProductEntry);
     }
+    function deleteMatchingLevel(productEntry) {
+        const matchingLevel = document.getElementById('matchingLevel');
+        matchingLevel.removeChild(productEntry);  
+    }
+    
+    const buttons = document.querySelectorAll('.btn-primary');
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+           
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            console.log(`${button.innerText} clicked`);
+        });
+    });           
+
 
     document.getElementById('binaryBtn').addEventListener('click', function() {
         toggleForms('binaryForm');
+    });
+    window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('binaryBtn').click();
     });
     document.getElementById('unilevelBtn').addEventListener('click', function() {
         toggleForms('unilevelForm');

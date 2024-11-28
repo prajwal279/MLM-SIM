@@ -8,7 +8,6 @@ import (
 	"math"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type TreeStructure struct {
@@ -190,26 +189,34 @@ func AssignJoiningFee(nodes []*TreeStructure, joining_package_fee []float64, b_v
 	}
 }
 
-func AllocateMembers(numMembers int, product_quantity []int, startID int, result []*TreeStructure, joining_package_fee []float64, b_volume []float64) ([][]int, int, [][]*TreeStructure) {
+func AllocateMembers(numMembers int, product_quantity []int, startID int, result []*TreeStructure, joining_package_fee []float64, b_volume []float64) ([][]int, int, [][]*TreeStructure, float64) {
 	currentID := startID
-	remaing := numMembers + 2
+	remaining := numMembers
 	var allCycles [][]int
+	var totalJoiningFee float64 = 0
 	cycleCount := 1
-	for remaing > 2 {
+	var all_data [][]*TreeStructure
+
+	for remaining > 0 {
 		var cycle [][]int
-		for _, qty := range product_quantity {
+		for i, qty := range product_quantity {
 			cycleID := []int{}
-			for j := 0; j < qty && remaing > 2; j++ {
+
+			assignQty := int(math.Min(float64(qty), float64(remaining)))
+			for j := 0; j < assignQty; j++ {
 				cycleID = append(cycleID, currentID)
 				currentID++
-				remaing--
+				remaining--
 			}
 			cycle = append(cycle, cycleID)
-			if remaing <= 0 {
+
+			totalJoiningFee += float64(assignQty) * joining_package_fee[i]
+
+			if remaining <= 0 {
 				break
 			}
-
 		}
+
 		var temp []*TreeStructure
 		for _, node := range result {
 			if node.UserID < currentID {
@@ -219,18 +226,25 @@ func AllocateMembers(numMembers int, product_quantity []int, startID int, result
 		AssignJoiningFee(temp, joining_package_fee, b_volume, product_quantity)
 		all_data = append(all_data, temp)
 		cycleCount++
+
 		for _, lst := range cycle {
 			if len(lst) > 0 {
 				allCycles = append(allCycles, lst)
 			}
 		}
 	}
-	return allCycles, cycleCount, all_data
+	return allCycles, cycleCount, all_data, totalJoiningFee
 }
 
-func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, cappingAmount float64, cappingScope, bonusOption string) map[int]float64 {
-	totalBonus := make(map[int]float64)
+func FindProfitTOCompany(ExpenseMembers float64, totalJoiningFee float64) float64 {
+	var total_Profit float64
+	total_Profit = totalJoiningFee - ExpenseMembers
+	return total_Profit
+}
 
+func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, cappingAmount float64, cappingScope, bonusOption string) (float64, map[int]float64) {
+	var TSB float64
+	totalBonus := make(map[int]float64)
 	calculateBonus := func(member *TreeStructure, valueSelector func(*TreeStructure) float64) float64 {
 		var rightBonus, leftBonus float64
 
@@ -241,12 +255,11 @@ func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float
 			leftBonus = valueSelector(member.LeftMember) * sponsorBonusPercent / 100
 		}
 
-		totalBonus := rightBonus + leftBonus
-		if strings.Contains(cappingScope, "sponsor") && totalBonus > cappingAmount {
-			print(totalBonus)
+		TSB := rightBonus + leftBonus
+		if strings.Contains(cappingScope, "sponsor") && TSB > cappingAmount {
 			return cappingAmount
 		}
-		return totalBonus
+		return TSB
 	}
 
 	for i, list := range allData {
@@ -260,11 +273,12 @@ func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float
 			}
 
 			member.SponsorBonus = bonus
+			TSB += bonus
 			totalBonus[i] += bonus
 		}
 	}
 
-	return totalBonus
+	return TSB, totalBonus
 }
 
 func Traverse(node *TreeStructure, limit int, bonus_option string) float64 {
@@ -283,9 +297,9 @@ func Traverse(node *TreeStructure, limit int, bonus_option string) float64 {
 	return currentSales + leftSales + rightSales
 }
 
-func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio string, ratioAmount int, cappingScope string, cappingAmount float64, cycleCount int) map[int]float64 {
-	start := time.Now()
-	total := make(map[int]float64)
+func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio string, ratioAmount int, cappingScope string, cappingAmount float64, cycleCount int) (float64, map[int]float64) {
+	var TBB float64
+	totalBonus := make(map[int]float64)
 	b1 := 10
 	b2 := 15
 	b3 := 20
@@ -351,18 +365,17 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 			}
 
 			node.BinaryBonus = float64(nodeBonus)
-			total[i] += node.BinaryBonus
+			TBB += node.BinaryBonus
+			totalBonus[i] += node.BinaryBonus
 
 		}
 	}
-	elapsed := time.Since(start)
-	fmt.Println("time elapse in nanoseconds:", elapsed)
-	return total
+	return TBB, totalBonus
 }
 
-func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) map[int]float64 {
+func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
+	var TMB float64
 	totalBonus := make(map[int]float64)
-
 	for _, members := range allData {
 		for _, member := range members {
 			iterant := 0
@@ -379,10 +392,11 @@ func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []fl
 			if strings.Contains(cappingScope, "matching") && member.MatchingBonus > cappingAmount {
 				member.MatchingBonus = cappingAmount
 			}
+			TMB += member.MatchingBonus
 			totalBonus[i] += member.MatchingBonus
 		}
 	}
-	return totalBonus
+	return TMB, totalBonus
 }
 
 func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPercentages []float64, iterant int, cappingAmount float64, cappingScope string) {
@@ -424,6 +438,11 @@ func main() {
 		numMembers, ok := data["num_members"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'num_members' field", http.StatusBadRequest)
+			return
+		}
+		ExpenseMembers, ok := data["expense_per_user"].(float64)
+		if !ok {
+			http.Error(w, "Invalid or missing 'expense_per_user' field", http.StatusBadRequest)
 			return
 		}
 		sponsorPercentage, ok := data["sponsor_percentage"].(float64)
@@ -477,18 +496,6 @@ func main() {
 				}
 			}
 		}
-		// productName, ok := data["product_name"].([]interface{})
-		// if !ok {
-		// 	http.Error(w, "Invalid or missing 'product_name' field", http.StatusBadRequest)
-		// 	return
-		// }
-		// var p_name []string
-		// for _, v := range productName {
-		// 	if str, ok := v.(string); ok {
-		// 		p_name = append(p_name, str)
-		// 	}
-		// }
-		// print("---------------", productName)
 		product_quantity, ok := data["product_quantity"].([]interface{})
 		if !ok {
 			http.Error(w, "Invalid or missing 'product_quantity' field", http.StatusBadRequest)
@@ -510,8 +517,6 @@ func main() {
 			http.Error(w, "Invalid or missing 'capping_scope' field", http.StatusBadRequest)
 			return
 		}
-		//scopes := strings.Split(cappingScope, ",")
-		fmt.Println(".............................", cappingScope)
 
 		bonusOption, ok := data["bonus_option"].(string)
 		if !ok {
@@ -531,7 +536,7 @@ func main() {
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
 		result := buildTree(root, int(numMembers), 2)
 
-		stored_id, cycleCount, all_data := AllocateMembers(int(numMembers), intData, 2, result, floatData, bv)
+		stored_id, cycleCount, all_data, totalJoiningFee := AllocateMembers(int(numMembers), intData, 2, result, floatData, bv)
 		var cycleList [][]*TreeStructure
 		for _, list := range all_data {
 			var copiedMembers []*TreeStructure
@@ -574,23 +579,31 @@ func main() {
 			}
 			cycleList = append(cycleList, copiedMembers)
 		}
-
-		totalSponsorBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope, bonusOption)
-		totalBinaryBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount)
-		totalMatchingBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
+		totalProfitToCompany := FindProfitTOCompany(ExpenseMembers, totalJoiningFee)
+		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope, bonusOption)
+		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount)
+		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
+		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus
 		var treeNodes [][]TreeStructureJSON
 		for _, list := range cycleList {
 			temp := convertToJSONStructure(list)
 			treeNodes = append(treeNodes, temp)
 		}
-		fmt.Println("000", stored_id)
+		fmt.Println("totalSponsorBonus", totalSPONSORBonus)
+		fmt.Println("totalBinaryBonus", totalBINARYBonus)
+		fmt.Println("totalMatchingBonus", totalMATCHINGBonus)
 		results := map[string]interface{}{
+			"totalProfitToCompany": totalProfitToCompany,
+			"TotalExpense":         TotalExpense,
 			"treeNodes":            treeNodes,
 			"stored_id":            stored_id,
 			"cycleCount":           cycleCount,
 			"total_sponsor_bonus":  totalSponsorBonus,
 			"total_binary_bonus":   totalBinaryBonus,
 			"total_matching_bonus": totalMatchingBonus,
+			"totalSPONSORBonus":    totalSPONSORBonus,
+			"totalBINARYBonus":     totalBINARYBonus,
+			"totalMATCHINGBonus":   totalMATCHINGBonus,
 		}
 		sendResultsToDjango(results)
 
@@ -642,4 +655,46 @@ func main() {
 // 		currentCycle = currentCycle + 1
 // 	}
 // 	return totalBonus
+// }
+
+// func AllocateMembers(numMembers int, product_quantity []int, startID int, result []*TreeStructure, joining_package_fee []float64, b_volume []float64) ([][]int, int, [][]*TreeStructure, float64) {
+// 	currentID := startID
+// 	remaing := numMembers + 2
+// 	var allCycles [][]int
+// 	var totalJoiningFee float64 = 0
+// 	cycleCount := 1
+// 	for remaing > 2 {
+// 		var cycle [][]int
+// 		for i, qty := range product_quantity {
+// 			cycleID := []int{}
+// 			for j := 0; j < qty && remaing > 2; j++ {
+// 				cycleID = append(cycleID, currentID)
+// 				currentID++
+// 				remaing--
+// 			}
+// 			cycle = append(cycle, cycleID)
+// 			if remaing <= 2 {
+// 				totalJoiningFee += float64(qty) * joining_package_fee[i]
+// 				break
+// 			}
+// 			fmt.Println("///",qty,joining_package_fee[i])
+// 			totalJoiningFee += float64(qty) * joining_package_fee[i]
+// 		}
+// 		var temp []*TreeStructure
+// 		for _, node := range result {
+// 			if node.UserID < currentID {
+// 				temp = append(temp, node)
+// 			}
+// 		}
+// 		AssignJoiningFee(temp, joining_package_fee, b_volume, product_quantity)
+// 		all_data = append(all_data, temp)
+// 		cycleCount++
+// 		for _, lst := range cycle {
+// 			if len(lst) > 0 {
+// 				allCycles = append(allCycles, lst)
+// 			}
+// 		}
+// 	}
+// 	fmt.Println("****************", totalJoiningFee)
+// 	return allCycles, cycleCount, all_data, totalJoiningFee
 // }

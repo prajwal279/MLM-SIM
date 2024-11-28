@@ -2,6 +2,7 @@ from django import forms
 
 class MemberForm(forms.Form):
     num_members=forms.IntegerField(label="No Of Members",min_value=1)
+    expense_per_user = forms.IntegerField(label="expense per user",min_value=1)
     product_name = forms.CharField(max_length=255, required=False)
     joining_package_fee = forms.CharField(max_length=255, required=False)
     b_v = forms.CharField(max_length=255, required=False)   

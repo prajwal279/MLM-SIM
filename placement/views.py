@@ -11,6 +11,7 @@ def build_new_tree(request):
         form = MemberForm(request.POST) 
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
+            expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = form.cleaned_data['sponsor_bonus_percent']
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
@@ -26,6 +27,7 @@ def build_new_tree(request):
             ratio_amount = form.cleaned_data['ratio_amount']
             data = {
                 "num_members": num_members,
+                "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
                 "sponsor_percentage": sponsor_bonus_percent,
                 "binary_percentage": binary_bonus_percent,
@@ -48,6 +50,8 @@ def build_new_tree(request):
                 results = response.json()  
                 return render(request, 'display_members.html', {
                     'results': results,
+                    'num_members':num_members,
+                    'joining_package_fee':joining_package_fee,
                 })
             except requests.exceptions.RequestException as e:
                 return JsonResponse({'error': f'Failed to communicate with Go server: {str(e)}'}, status=500)
@@ -78,3 +82,8 @@ def process_results(request):
         return render_context
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+    
+    # <tr><td>Total Sponsor Bonus:</td><td> {{results.total_sponsor_bonus}} INR</td></tr><br>
+    # <tr><td>Total Binary Bonus:</td><td> {{results.total_binary_bonus }} INR</td></tr><br>
+    # <tr><td>Total Matching Bonus:</td><td> {{results.total_matching_bonus }} INR</td></tr><br>
