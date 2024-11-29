@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"strings"
 )
-	
+
 type TreeStructure struct {
 	UserID              int
 	ParentID            *TreeStructure
-	Children			[]*TreeStructure
+	Children            []*TreeStructure
 	Joining_package_fee float64
 	BV                  float64
 	Position            string
@@ -412,24 +412,10 @@ func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPe
 	ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 func buildUnilevelTree(root *TreeStructure, numMembers int, startID int, numChild int) []*TreeStructure {
 	if numMembers <= 0 {
 		return nil
 	}
-
 	treeNodes := []*TreeStructure{root}
 	queue := []*TreeStructure{root}
 	currentID := startID
@@ -446,7 +432,7 @@ func buildUnilevelTree(root *TreeStructure, numMembers int, startID int, numChil
 				Levels:   node.Levels + 1,
 			}
 			node.Children = append(node.Children, child)
-			fmt.Println("----",node.Children)
+			// fmt.Println("<<<>>>",node.Children)
 			queue = append(queue, child)
 			treeNodes = append(treeNodes, child)
 			currentID++
@@ -456,39 +442,33 @@ func buildUnilevelTree(root *TreeStructure, numMembers int, startID int, numChil
 	return treeNodes
 }
 
-// var all_data [][]*TreeStructure
-
-func AssignUnilevelJoiningFee(nodes []*TreeStructure, joining_package_fee []float64, b_volume []float64, product_quantity []int) {
+func AssignUnilevelJoiningFee(nodes []*TreeStructure, joining_package_fee []float64, product_quantity []int) {
 	if len(nodes) <= 1 {
 		return
 	}
 	allExceptFirst := nodes[1:]
-	var jpf, bv float64
+	var jpf float64
 	iterant := 0
-	var assig_list, bv_assig_list []float64
+	var assig_list []float64
 
 	for count, i := range product_quantity {
 		for j := 0; j < i; j = j + 1 {
 			assig_list = append(assig_list, joining_package_fee[count])
-			bv_assig_list = append(bv_assig_list, b_volume[count])
 		}
 	}
 	for _, node := range allExceptFirst {
 		if iterant < len(assig_list) {
 			jpf = assig_list[iterant]
-			bv = bv_assig_list[iterant]
 		} else {
 			iterant = 0
 			jpf = joining_package_fee[iterant]
-			bv = b_volume[iterant]
 		}
 		node.Joining_package_fee = jpf
-		node.BV = bv
 		iterant = iterant + 1
 	}
 }
 
-func AllocateUnilevelMembers(numMembers int, product_quantity []int, startID int, result []*TreeStructure, joining_package_fee []float64, b_volume []float64) ([][]int, int, [][]*TreeStructure, float64) {
+func AllocateUnilevelMembers(numMembers int, product_quantity []int, startID int, result []*TreeStructure, joining_package_fee []float64) ([][]int, int, [][]*TreeStructure, float64) {
 	currentID := startID
 	remaining := numMembers
 	var allCycles [][]int
@@ -522,7 +502,7 @@ func AllocateUnilevelMembers(numMembers int, product_quantity []int, startID int
 				temp = append(temp, node)
 			}
 		}
-		AssignJoiningFee(temp, joining_package_fee, b_volume, product_quantity)
+		AssignUnilevelJoiningFee(temp, joining_package_fee, product_quantity)
 		all_data = append(all_data, temp)
 		cycleCount++
 
@@ -535,52 +515,29 @@ func AllocateUnilevelMembers(numMembers int, product_quantity []int, startID int
 	return allCycles, cycleCount, all_data, totalJoiningFee
 }
 
-func FindUnilevelProfitToCompany(ExpenseMembers float64, totalJoiningFee float64) float64 {
-	var total_Profit float64
-	total_Profit = totalJoiningFee - ExpenseMembers
-	return total_Profit
-}
-
-func CalculateUnilevelSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, cappingAmount float64, cappingScope, bonusOption string) (float64, map[int]float64) {
+func CalculateUnilevelSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
 	var TSB float64
 	totalBonus := make(map[int]float64)
-	
-	calculateBonus := func(member *TreeStructure, valueSelector func(*TreeStructure) float64) float64 {
-		var totalChildBonus float64
-
-		for _, child := range member.Children {
-			childBonus := valueSelector(child) * sponsorBonusPercent / 100
-			totalChildBonus += childBonus
-		}
-
-		if strings.Contains(cappingScope, "sponsor") && totalChildBonus > cappingAmount {
-			return cappingAmount
-		}
-
-		return totalChildBonus
-	}
 
 	for i, list := range allData {
 		for _, member := range list {
-			var bonus float64
+			var totalChildBonus float64
+			for _, child := range member.Children {
 
-			if strings.Contains(bonusOption, "PRICE") {
-				bonus = calculateBonus(member, func(m *TreeStructure) float64 { return m.Joining_package_fee })
-			} else if strings.Contains(bonusOption, "BV") {
-				bonus = calculateBonus(member, func(m *TreeStructure) float64 { return m.BV })
+				childBonus := float64(child.Joining_package_fee) * sponsorBonusPercent / 100
+				totalChildBonus += childBonus
 			}
-
-			member.SponsorBonus = bonus
-			TSB += bonus
-			totalBonus[i] += bonus
+			if strings.Contains(cappingScope, "sponsor") && totalChildBonus > cappingAmount {
+				totalChildBonus = cappingAmount
+			}
+			member.SponsorBonus = totalChildBonus
+			TSB += totalChildBonus
+			totalBonus[i] += totalChildBonus
 		}
 	}
-
+	fmt.Println("*-*-*-*", TSB, totalBonus)
 	return TSB, totalBonus
 }
-
-
-
 func CalculateUnilevelMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
 	var TMB float64
 	totalBonus := make(map[int]float64)
@@ -618,6 +575,12 @@ func ApplyUnilevelMatchingBonus(member *TreeStructure, parent *TreeStructure, ma
 	parent = parent.ParentID
 	ApplyUnilevelMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
+func FindUnilevelProfitToCompany(ExpenseMembers float64, totalJoiningFee float64) float64 {
+	var total_Profit float64
+	total_Profit = totalJoiningFee - ExpenseMembers
+	return total_Profit
+}
+
 func sendResultsToDjango(results interface{}) {
 	jsonData, err := json.Marshal(results)
 	if err != nil {
@@ -640,7 +603,7 @@ func main() {
 			return
 		}
 
-		fmt.Println("Received data:", data)
+		// fmt.Println("Received data:", data)
 
 		numMembers, ok := data["num_members"].(float64)
 		if !ok {
@@ -790,29 +753,26 @@ func main() {
 		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope, bonusOption)
 		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount)
 		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		TotalUnilevelExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus
-		
-		
+		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus
+
 		var treeNodes [][]TreeStructureJSON
 		for _, list := range cycleList {
 			temp := convertToJSONStructure(list)
 			treeNodes = append(treeNodes, temp)
 		}
-		fmt.Println("totalSponsorBonus", totalSPONSORBonus)
-		fmt.Println("totalBinaryBonus", totalBINARYBonus)
-		fmt.Println("totalMatchingBonus", totalMATCHINGBonus)
+
 		results := map[string]interface{}{
-			"totalProfitToCompany":			totalProfitToCompany,
-			"TotalUnilevelExpense":         TotalUnilevelExpense,
-			"treeNodes":            		treeNodes,
-			"stored_id":            		stored_id,
-			"cycleCount":           		cycleCount,
-			"total_sponsor_bonus":  		totalSponsorBonus,
-			"total_binary_bonus":   		totalBinaryBonus,
-			"total_matching_bonus": 		totalMatchingBonus,
-			"totalSPONSORBonus":    		totalSPONSORBonus,
-			"totalBINARYBonus":     		totalBINARYBonus,
-			"totalMATCHINGBonus":   		totalMATCHINGBonus,
+			"totalProfitToCompany": totalProfitToCompany,
+			"TotalExpense":         TotalExpense,
+			"treeNodes":            treeNodes,
+			"stored_id":            stored_id,
+			"cycleCount":           cycleCount,
+			"total_sponsor_bonus":  totalSponsorBonus,
+			"total_binary_bonus":   totalBinaryBonus,
+			"total_matching_bonus": totalMatchingBonus,
+			"totalSPONSORBonus":    totalSPONSORBonus,
+			"totalBINARYBonus":     totalBINARYBonus,
+			"totalMATCHINGBonus":   totalMATCHINGBonus,
 		}
 		sendResultsToDjango(results)
 
@@ -829,7 +789,6 @@ func main() {
 		}
 
 		fmt.Println("Received data:", data)
-
 		numMembers, ok := data["num_members"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'num_members' field", http.StatusBadRequest)
@@ -852,7 +811,6 @@ func main() {
 		}
 		floatData := make([]float64, 0)
 		percData := make([]float64, 0)
-		bv := make([]float64, 0)
 
 		var intData []int
 		matchingPercentages, ok := data["matching_percentage"].([]interface{})
@@ -873,7 +831,6 @@ func main() {
 				}
 			}
 		}
-
 		joining_package_fee, ok := data["joining_package_fee"].([]interface{})
 		if !ok {
 			http.Error(w, "Invalid or missing 'joining_package_fee' field", http.StatusBadRequest)
@@ -882,17 +839,6 @@ func main() {
 			for _, v := range joining_package_fee {
 				if num, ok := v.(float64); ok {
 					floatData = append(floatData, float64(num))
-				}
-			}
-		}
-		b_volume, ok := data["b_volume"].([]interface{})
-		if !ok {
-			http.Error(w, "Invalid or missing 'b_volume' field", http.StatusBadRequest)
-			return
-		} else {
-			for _, v := range b_volume {
-				if num, ok := v.(float64); ok {
-					bv = append(bv, float64(num))
 				}
 			}
 		}
@@ -917,17 +863,10 @@ func main() {
 			http.Error(w, "Invalid or missing 'capping_scope' field", http.StatusBadRequest)
 			return
 		}
-
-		bonusOption, ok := data["bonus_option"].(string)
-		if !ok {
-			http.Error(w, "Invalid or missing 'bonus_option' field", http.StatusBadRequest)
-			return
-		}
-
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
 		result := buildUnilevelTree(root, int(numMembers), 2, int(numChild))
-
-		stored_id, cycleCount, all_data, totalJoiningFee := AllocateMembers(int(numMembers), intData, 2, result, floatData, bv)
+		stored_id, cycleCount, all_data, totalJoiningFee := AllocateUnilevelMembers(int(numMembers), intData, 2, result, floatData)
+		fmt.Println("13")
 		var cycleList [][]*TreeStructure
 		for _, list := range all_data {
 			var copiedMembers []*TreeStructure
@@ -936,6 +875,7 @@ func main() {
 					UserID:              member.UserID,
 					Levels:              member.Levels,
 					ParentID:            member.ParentID,
+					Children:            member.Children,
 					Cycle:               member.Cycle,
 					Position:            member.Position,
 					BV:                  member.BV,
@@ -961,6 +901,13 @@ func main() {
 						copiedMember.RightMember = nil
 					}
 				}
+				if copiedMember.Children != nil {
+					for _, child := range copiedMember.Children {
+						if child.UserID > len(list) {
+							child = nil
+						}
+					}
+				}
 				copiedMembers = append(copiedMembers, copiedMember)
 			}
 			for _, member := range copiedMembers {
@@ -970,27 +917,29 @@ func main() {
 			}
 			cycleList = append(cycleList, copiedMembers)
 		}
-		totalUnilevelProfitToCompany := FindUnilevelProfitToCompany(ExpenseMembers, totalJoiningFee) 
-		totalUnilevelSponsorBonus, totalUnilevelSPONSORBonus := CalculateUnilevelSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope, bonusOption)
+		for _, list := range cycleList {
+			for _, member := range list {
+				fmt.Println(member.Children)
+			}
+		}
+		totalUnilevelSponsorBonus, totalUnilevelSPONSORBonus := CalculateUnilevelSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope)
 		totalUnilevelMatchingBonus, totalUnilevelMATCHINGBonus := CalculateUnilevelMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
+		totalUnilevelProfitToCompany := FindUnilevelProfitToCompany(ExpenseMembers, totalJoiningFee)
 		TotalUnilevelExpense := totalUnilevelSponsorBonus + totalUnilevelMatchingBonus
-		// fmt.Println("totalSponsorBonus", totalSPONSORBonus)
-		// fmt.Println("totalBinaryBonus", totalBINARYBonus)
-		// fmt.Println("totalMatchingBonus", totalMATCHINGBonus)
 		var treeNodes [][]TreeStructureJSON
 		for _, list := range cycleList {
 			temp := convertToJSONStructure(list)
 			treeNodes = append(treeNodes, temp)
 		}
-		
+
 		results := map[string]interface{}{
 			"TotalUnilevelExpense":         TotalUnilevelExpense,
-			"treeNodes":           			treeNodes,
-			"stored_id":           			stored_id,
-			"cycleCount":           		cycleCount,
+			"treeNodes":                    treeNodes,
+			"stored_id":                    stored_id,
+			"cycleCount":                   cycleCount,
 			"totalUnilevelProfitToCompany": totalUnilevelProfitToCompany,
 			"totalUnilevelSponsorBonus":    totalUnilevelSponsorBonus,
-			"totalUnilevelMatchingBonus": 	totalUnilevelMatchingBonus,
+			"totalUnilevelMatchingBonus":   totalUnilevelMatchingBonus,
 			"totalUnilevelSPONSORBonus":    totalUnilevelSPONSORBonus,
 			"totalUnilevelMATCHINGBonus":   totalUnilevelMATCHINGBonus,
 		}

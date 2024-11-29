@@ -97,7 +97,6 @@ def build_unilevel_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
-           
             try:
                 response = requests.post('http://localhost:9000/unilevel', json=data)
                 response.raise_for_status() 

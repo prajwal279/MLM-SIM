@@ -117,7 +117,7 @@
     <h2>MLM Plan Calculator</h2>
      
 
-    <form id="mlmCalculator" method="post">
+    <form id="mlmCalculator" method="post" >
         {% csrf_token %}
         <div class="row g-3">
             <div class="col-md-6">
@@ -371,12 +371,14 @@
 
     document.getElementById('binaryBtn').addEventListener('click', function() {
         toggleForms('binaryForm');
+        document.getElementById("mlmCalculator").action = "{% url 'build_new_tree' %}"
     });
     window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('binaryBtn').click();
     });
     document.getElementById('unilevelBtn').addEventListener('click', function() {
         toggleForms('unilevelForm');
+        document.getElementById("mlmCalculator").action = "{% url 'build_unilevel_tree' %}"
     });
     document.getElementById('matrixBtn').addEventListener('click', function() {
         toggleForms('matrixForm');
