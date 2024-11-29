@@ -177,7 +177,7 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-primary mt-3" onclick="addProduct()">+ Add Product</button>
+        <button class="btn btn-primary mt-3" onclick="add()">+ Add Product</button>
 
         
         <div id="binaryForm" class="plan-card hidden mt-4">
@@ -219,19 +219,23 @@
 
         <div id="unilevelForm" class="plan-card hidden mt-4">
             <h5>UNILEVEL MLM Plan</h5>
-            {% comment %} <div class="row g-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="num_child" class="form-label">No of child</label>
+                    <input type="number" class="form-control" id="sponsorBonus" name="num_child" placeholder="No of child">
+                </div>
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
                     <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                 </div>
-                <div id="matchingLevel1">
+                <div id="matchingUnilevel">
                     <div class="col-md-6">
                         <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
                         <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
-            </div> {% endcomment %}
+                <button class="btn btn-primary mt-3 w-25" onclick="addUnilevelMatching()">+Add Level</button>
+            </div> 
         </div>
 
         <div id="matrixForm" class="plan-card hidden mt-4">
@@ -268,30 +272,37 @@
 </div>
 
 <script>
-    function addProduct() {
-        event.preventDefault(); 
+    function add() {
+        event.preventDefault();
         const productContainer = document.getElementById('productContainer');
         const newProductEntry = productContainer.firstElementChild.cloneNode(true);
-    
         newProductEntry.querySelectorAll('input').forEach(input => input.value = '');
-        
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
         deleteButton.type = 'button';  
         deleteButton.classList.add('delete-btn');  
-                deleteButton.addEventListener('click', function() {
-            deleteProductEntry(newProductEntry);  
+        deleteButton.addEventListener('click', function() {
+            deleteProduct(newProductEntry); 
         });
-            newProductEntry.appendChild(deleteButton);
-            productContainer.appendChild(newProductEntry);
+        newProductEntry.appendChild(deleteButton);
+        productContainer.appendChild(newProductEntry);
     }
-    
-    
-    function deleteProductEntry(productEntry) {
+    function deleteProduct(productEntry) {
         const productContainer = document.getElementById('productContainer');
         productContainer.removeChild(productEntry);  
     }
     
+    const b = document.querySelectorAll('.btn-primary');
+    b.forEach(button => {
+        button.addEventListener('click', () => {
+           
+            b.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            console.log(`${button.innerText} clicked`);
+        });
+    });  
+
 
     function addMatching() {
         event.preventDefault();
@@ -324,6 +335,39 @@
         });
     });           
 
+
+    function addUnilevelMatching() {
+        event.preventDefault(); 
+        const matchingUnilevel = document.getElementById('matchingUnilevel');
+        const newProductEntry = matchingUnilevel.firstElementChild.cloneNode(true);
+    
+        newProductEntry.querySelectorAll('input').forEach(input => input.value = '');
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.type = 'button';  
+        deleteButton.classList.add('delete-btn');  
+                deleteButton.addEventListener('click', function() {
+            deleteProductEntry(newProductEntry);  
+        });
+            newProductEntry.appendChild(deleteButton);
+            matchingUnilevel.appendChild(newProductEntry);
+    }
+    const y = document.querySelectorAll('.btn-primary');
+    y.forEach(button => {
+        button.addEventListener('click', () => {
+           
+            y.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            console.log(`${button.innerText} clicked`);
+        });
+    });  
+    
+    function deleteProductEntry(productEntry) {
+        const matchingUnilevel = document.getElementById('matchingUnilevel');
+        matchingUnilevel.removeChild(productEntry);  
+    }
 
     document.getElementById('binaryBtn').addEventListener('click', function() {
         toggleForms('binaryForm');
