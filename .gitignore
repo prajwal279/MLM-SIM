@@ -1,0 +1,21 @@
+# Ignore Python environment folder
+myenv/
+
+# Ignore database file
+db.sqlite3
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore the migrations folder if it exists
+mlm_app/migrations/
+
+# Ignore logs or temporary files
+*.log
+
+# Ignore IDE or editor configuration files (example for VS Code, PyCharm)
+.vscode/
+.idea/
+
+# Ignore other environment or build files
+.env
