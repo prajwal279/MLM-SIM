@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <h1>Bonus Breakdown</h1>
+    
+    <!-- Canvas element for Chart.js -->
+    <canvas id="bonusChart" width="400" height="200"></canvas>
+
+    <script>
+        // Pass the bonus data into JavaScript
+        const sponsorBonusData = {{ results.totalSPONSORBonus|safe }};
+        const binaryBonusData = {{ results.totalBINARYBonus|safe }};
+        const matchingBonusData = {{ results.totalMATCHINGBonus|safe }};
+
+        // Check the output in the browser's console to verify data
+        console.log('Sponsor Bonus:', sponsorBonusData);
+        console.log('Binary Bonus:', binaryBonusData);
+        console.log('Matching Bonus:', matchingBonusData);
+
+        // Prepare the data for Chart.js
+        const chartData = {
+      
+            datasets: [{
+                    label: 'Sponsor Bonus',
+                    data: sponsorBonusData,  // Data for Sponsor Bonus
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                },
+                {
+                    label: 'Binary Bonus',
+                    data: binaryBonusData,  // Data for Binary Bonus
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    fill: true
+                },
+                {
+                    label: 'Matching Bonus',
+                    data: matchingBonusData,  // Data for Matching Bonus
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    fill: true
+                }
+            ]
+        };
+
+        // Chart configuration
+        const config = {
+            type: 'line',  // Line chart
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Bonus Breakdown for Each Cycle'
+                    },
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                }
+            },
+        };
+
+        // Create the chart
+        const ctx = document.getElementById('bonusChart').getContext('2d');
+        new Chart(ctx, config);
+    </script>
+
+</body>
+</html>

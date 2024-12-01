@@ -1,0 +1,228 @@
+ <!DOCTYPE html>
+<html>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: auto;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #000;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus and Profit Table</title>
+</head>
+<body>
+<div id="myChart" style="width:100%; max-width:600px; height:500px;"></div>
+<div id="mySecondChart" style="width:100%; max-width:600px; height:500px;"></div>
+
+<script>
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawCharts);
+
+function drawCharts() {
+  
+  var totalSponsorBonus = {{results.total_sponsor_bonus}};  
+  var totalBinaryBonus =  {{results.total_binary_bonus}};
+  var totalMatchingBonus = {{results.total_matching_bonus}};
+  var totalProfitToCompany = {{results.totalProfitToCompany}};
+  var TotalExpense = {{results.TotalExpense}};
+  
+  const data1 = google.visualization.arrayToDataTable([
+    ['Category', 'Amount'],
+    ['Profit', totalProfitToCompany],
+    ['Expense', TotalExpense]
+  ]);
+
+  const options1 = {
+    title: 'Company Financials',
+    is3D: true,
+    pieSliceText: 'percentage', 
+    slices: {
+      0: {offset: 0.1}, 
+      1: {offset: 0.05} 
+    },
+    fontName: 'Arial',
+    fontSize: 14,
+    chartArea: {width: '90%', height: '80%'}
+  };
+  const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
+  chart1.draw(data1, options1);
+
+  const data2 = google.visualization.arrayToDataTable([
+    ['Bonus Type', 'Amount'],
+    ['Sponsor Bonus', totalSponsorBonus],
+    ['Binary Bonus', totalBinaryBonus],
+    ['Matching Bonus', totalMatchingBonus]
+  ]);
+
+  const options2 = {
+    title: 'Bonus Breakdown',
+    is3D: true,
+    pieSliceText: 'value', 
+    slices: {
+      0: {offset: 0.1, color: 'green'}, 
+      1: {offset: 0.05, color: 'Turquoise'},
+      2: {color: 'Violet'} 
+    },
+    fontName: 'Arial',
+    fontSize: 14,
+    chartArea: {width: '90%', height: '80%'} 
+  };
+  const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));
+  chart2.draw(data2, options2);
+}
+</script>
+
+<table>
+    <tr>
+        <th>No. of Members</th>
+        <td>{{ num_members }}</td> 
+    </tr>
+    <tr>
+        <th>Income from Joiing Package Purchase</th>
+        <td>{{ results.totalProfitToCompany }}</td> 
+    </tr>
+    <tr>
+        <th>Sponsor Bonus</th>
+        <td>{{ results.total_sponsor_bonus }}</td> 
+    </tr>
+    <tr>
+        <th>Binary Bonus</th>
+        <td>{{ results.total_binary_bonus }}</td> 
+    </tr>
+    <tr>
+        <th>Matching Bonus</th>
+        <td> {{ results.total_matching_bonus }}</td> 
+    </tr>
+    <tr>
+        <th>TOTAL PROFIT</th>
+        <td>{{ results.totalProfitToCompany }}</td> 
+    </tr>
+    <tr>
+        <th>TOTAL EXPENSE</th>
+        <td>{{ results.TotalExpense }}</td> 
+    </tr>
+</table>
+
+<!-- <table border="1">
+  <thead>
+    <tr>
+      <th>Level</th>
+      <th>Members in Each Level</th>
+      <th>Binary Pairs</th>
+      <th>Team Count</th>
+      <th>Sponsor Bonus</th>
+      <th>Binary Bonus</th>
+      <th>Matching Bonus</th>
+      <th>Capped Bonuses (Sponsor+Binary+Matching)</th>
+      <th>Total Binary Bonuses in this Level</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1</td>
+      <td>1 × 7</td>
+      <td>30</td>
+      <td>204.8</td>
+      <td>716.8</td>
+      <td>102.4</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>2 × 3</td>
+      <td>28</td>
+      <td>409.6</td>
+      <td>614.4</td>
+      <td>40.96</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4</td>
+      <td>4 × 1</td>
+      <td>24</td>
+      <td>819.2</td>
+      <td>409.6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>8</td>
+      <td>8 × 0</td>
+      <td>16</td>
+      <td>1638.4</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>16</td>
+      <td>16 × 0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table> -->
+
+
+</body>
+</html> 
+
+ 
+<!-- <head>
+    <title>Unilevel</title>
+</head>
+<body>
+    <h1>Unilevel</h1>
+    
+    <p>{{results.totalUnilevelSponsorBonus}}</p></br>
+    <p>{{results.totalUnilevelMatchingBonus}}</p></br>
+
+    <p>{{results.TotalUnilevelExpense}}</p></br>
+    <p>{{results.totalUnilevelProfitToCompany}}</p></br>
+    
+    <p>{{results.totalUnilevelSPONSORBonus}}</p></br>
+    <p>{{results.totalUnilevelMATCHINGBonus}}</p>
+    <p>{{results.stored_id}}</p>
+</body> 
+
+<head>
+    <title>Matrixlevel</title>
+</head>
+<body>
+    <h1>Matrixlevel</h1>
+    
+    <p>{{results.totalUnilevelSponsorBonus}}</p></br>
+    <p>{{results.totalUnilevelMatchingBonus}}</p></br>
+
+    <p>{{results.TotalUnilevelExpense}}</p></br>
+    <p>{{results.totalUnilevelProfitToCompany}}</p></br>
+    
+    <p>{{results.totalUnilevelSPONSORBonus}}</p></br>
+    <p>{{results.totalUnilevelMATCHINGBonus}}</p>
+    <p>{{results.stored_id}}</p>
+</body>  -->
