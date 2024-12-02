@@ -181,10 +181,10 @@
 
         
         <div id="binaryForm" class="plan-card hidden mt-4">
-            <h5>BINARY MLM Plan</h5>
+            <h5>Binary Pairing Bonus Calculation</h5>
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="binaryPercentage" class="form-label">Binary %</label>
+                    <label for="binaryPercentage" class="form-label">Binary Percentage</label>
                     {% comment %} {{ form.binary_bonus_percent }} {% endcomment %}
                     <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
                 </div>
@@ -218,16 +218,17 @@
         </div>
 
         <div id="unilevelForm" class="plan-card hidden mt-4">
-            <h5>UNILEVEL MLM Plan</h5>
+            <h5>Unilevel Bonus Calculation</h5>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="num_child" class="form-label">No of child</label>
-                    <input type="number" class="form-control" id="sponsorBonus" name="num_child" placeholder="No of child">
-                </div>
+                    <label for="numChild" class="form-label">No of child</label>
+                    <input type="number" class="form-control" id="numChild" name="num_child" placeholder="No of child">
+                </div> 
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
                     <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                 </div>
+                
                 <div id="matchingUnilevel">
                     <div class="col-md-6">
                         <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
@@ -239,20 +240,24 @@
         </div>
 
         <div id="matrixForm" class="plan-card hidden mt-4">
-            <h5>MATRIX MLM Plan</h5>
-            {% comment %} <div class="row g-3">
+            <h5>Matrix Bonus Calculation</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="numChild" class="form-label">No of child</label>
+                    <input type="number" class="form-control" id="numChild" name="num_child" placeholder="No of child">
+                </div>          
                 <div class="col-md-6">
                     <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
                     <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                 </div>
-                <div id="matchingLevel1">
+                <div id="matchingLevel2">
                     <div class="col-md-6">
                         <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
                         <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
-            </div> {% endcomment %}
+                <button class="btn btn-primary mt-3 w-25" onclick="addMatrix()">+Add Level</button>
+            </div>
         </div>
         
         <div class="plan-card mt-4 p-4">
@@ -267,7 +272,6 @@
                 </div>
             </div>
             <input type="submit" value="Simulate" class="submit-btn">
-        {% comment %} <input type="submit"> {% endcomment %}
     </form>
 </div>
 
@@ -336,6 +340,38 @@
     });           
 
 
+    function addMatrix() {
+        event.preventDefault();
+        const matchingLevel2 = document.getElementById('matchingLevel2');
+        const newProductEntry = matchingLevel2.firstElementChild.cloneNode(true);
+        newProductEntry.querySelectorAll('input').forEach(input => input.value = '');
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.type = 'button';  
+        deleteButton.classList.add('delete-btn');  
+        deleteButton.addEventListener('click', function() {
+            deleteProduct(newProductEntry); 
+        });
+        newProductEntry.appendChild(deleteButton);
+        matchingLevel2.appendChild(newProductEntry);
+    }
+    function deleteProduct(productEntry) {
+        const matchingLevel2 = document.getElementById('matchingLevel2');
+        matchingLevel2.removeChild(productEntry);  
+    }
+    
+    const m = document.querySelectorAll('.btn-primary');
+    m.forEach(button => {
+        button.addEventListener('click', () => {
+           
+            m.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            console.log(`${button.innerText} clicked`);
+        });
+    });  
+
+
     function addUnilevelMatching() {
         event.preventDefault(); 
         const matchingUnilevel = document.getElementById('matchingUnilevel');
@@ -382,6 +418,7 @@
     });
     document.getElementById('matrixBtn').addEventListener('click', function() {
         toggleForms('matrixForm');
+        document.getElementById("mlmCalculator").action = "{% url 'build_matrix_tree' %}"
     });
 
     function toggleForms(formId) {

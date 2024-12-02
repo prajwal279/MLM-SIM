@@ -7,7 +7,7 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        table {
+        table { 
             border-collapse: collapse;
             width: 80%;
             margin: auto;
@@ -18,29 +18,30 @@
             border: 1px solid #000;
         }
     </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus and Profit Table</title>
 </head>
 <body>
 <div id="myChart" style="width:100%; max-width:600px; height:500px;"></div>
 <div id="mySecondChart" style="width:100%; max-width:600px; height:500px;"></div>
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bonus and Profit Table</title>
+
 <script>
-// Load Google Charts
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawCharts);
 
 function drawCharts() {
-
-  var totalSponsorBonus = {{results.total_sponsor_bonus}}; 
-  var totalBinaryBonus = {{results.total_binary_bonus}}; 
-  var totalMatchingBonus = {{results.total_matching_bonus}}; 
-
+  
+  var totalSponsorBonus = {{results.total_sponsor_bonus}};  
+  var totalBinaryBonus =  {{results.total_binary_bonus}};
+  var totalMatchingBonus = {{results.total_matching_bonus}};
+  var totalProfitToCompany = {{results.totalProfitToCompany}};
+  var TotalExpense = {{results.TotalExpense}};
   
   const data1 = google.visualization.arrayToDataTable([
     ['Category', 'Amount'],
-    ['Profit', {{results.totalProfitToCompany}}],
-    ['Expense', {{results.TotalExpense}}]
+    ['Profit', totalProfitToCompany],
+    ['Expense', TotalExpense]
   ]);
 
   const options1 = {
@@ -86,52 +87,36 @@ function drawCharts() {
 <table>
     <tr>
         <th>No. of Members</th>
-        <td>{{ num_members }}</td>
+        <td>{{ num_members }}</td> 
     </tr>
     <tr>
-        <th>TOTAL BINARY BONUS</th>
-        <td>{{ results.total_binary_bonus }}</td>
+        <th>Income from Joiing Package Purchase</th>
+        <td>{{ results.totalProfitToCompany }}</td> 
     </tr>
     <tr>
-        <th>TOTAL MATCHING BONUS</th>
-        <td>{{ results.total_matching_bonus }}</td>
+        <th>Sponsor Bonus</th>
+        <td>{{ results.total_sponsor_bonus }}</td> 
     </tr>
     <tr>
-        <th>TOTAL PROFIT</th>
-        <td>{{ results.totalProfitToCompany }}</td>
+        <th>Binary Bonus</th>
+        <td>{{ results.total_binary_bonus }}</td> 
     </tr>
     <tr>
-        <th>TOTAL EXPENSE</th>
-        <td>{{ results.TotalExpense }}</td>
-    </tr>
-</table>
-
-
-<table>
-    <tr>
-        <th>TOTAL SPONSOR BONUS</th>
-        <td>{{ results.total_sponsor_bonus }}</td>
-    </tr>
-    <tr>
-        <th>TOTAL BINARY BONUS</th>
-        <td>{{ results.total_binary_bonus }}</td>
-    </tr>
-    <tr>
-        <th>TOTAL MATCHING BONUS</th>
-        <td>{{ results.total_matching_bonus }}</td>
+        <th>Matching Bonus</th>
+        <td> {{ results.total_matching_bonus }}</td> 
     </tr>
     <tr>
         <th>TOTAL PROFIT</th>
-        <td>{{ results.totalProfitToCompany }}</td>
+        <td>{{ results.totalProfitToCompany }}</td> 
     </tr>
     <tr>
         <th>TOTAL EXPENSE</th>
-        <td>{{ results.TotalExpense }}</td>
+        <td>{{ results.TotalExpense }}</td> 
     </tr>
 </table>
+
 </body>
-</html>  {% endcomment %}
-
+</html> {% endcomment %}
  
 <head>
     <title>Unilevel</title>
@@ -147,5 +132,21 @@ function drawCharts() {
     
     <p>{{results.totalUnilevelSPONSORBonus}}</p></br>
     <p>{{results.totalUnilevelMATCHINGBonus}}</p>
+</body>  
+
+<head>
+    <title>Matrixlevel</title>
+</head>
+<body>
+    <h1>Matrixlevel</h1>
+    
+    <p>{{results.CalculateMatrixSponsorBonus}}</p></br>
+    <p>{{results.CalculateMatrixMatchingBonus}}</p></br>
+
+    <p>{{results.totalMatrixProfitToCompany}}</p></br>
+    <p>{{results.TotalMatrixExpense}}</p></br>
+    
+    <p>{{results.totalMatrixSPONSORBonus}}</p></br>
+    <p>{{results.totalMatrixMATCHINGBonus}}</p>
     <p>{{results.stored_id}}</p>
 </body> 
