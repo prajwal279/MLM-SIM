@@ -116,6 +116,13 @@
 <div class="container">
     <h2>MLM Plan Calculator</h2>
      
+    <div class="col-md-6 d-flex align-items-end">
+        <div class="btn-group w-100" role="group">
+            <button type="button" class="btn btn-primary active" id="binaryBtn">BINARY MLM</button>
+            <button type="button" class="btn btn-primary" id="unilevelBtn">UNILEVEL MLM</button>
+            <button type="button" class="btn btn-primary" id="matrixBtn">MATRIX MLM</button>
+        </div>
+    </div>
 
     <form id="mlmCalculator" method="post" >
         {% csrf_token %}
@@ -130,13 +137,7 @@
                     <option value="HKD">HKD</option>
                 </select>
             </div>
-            <div class="col-md-6 d-flex align-items-end">
-                <div class="btn-group w-100" role="group">
-                    <button type="button" class="btn btn-primary active" id="binaryBtn">BINARY MLM</button>
-                    <button type="button" class="btn btn-primary" id="unilevelBtn">UNILEVEL MLM</button>
-                    <button type="button" class="btn btn-primary" id="matrixBtn">MATRIX MLM</button>
-                </div>
-            </div>
+            
             <div class="col-md-6">
                 <label for="numMembers" class="form-label">No of Members</label>
                 <input type="number" class="form-control" id="numUsers" name="num_members" placeholder="Enter number of users">
@@ -183,6 +184,12 @@
         <div id="binaryForm" class="plan-card hidden mt-4">
             <h5>Binary Pairing Bonus Calculation</h5>
             <div class="row g-3">
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-primary active" id="binaryBtn">WEEK LEG</button>
+                        <button type="button" class="btn btn-primary" id="unilevelBtn">PAIRING</button>
+                    </div>
+                </div>
                 <div class="col-md-4">
                     <label for="binaryPercentage" class="form-label">Binary Percentage</label>
                     {% comment %} {{ form.binary_bonus_percent }} {% endcomment %}
@@ -350,12 +357,12 @@
         deleteButton.type = 'button';  
         deleteButton.classList.add('delete-btn');  
         deleteButton.addEventListener('click', function() {
-            deleteProduct(newProductEntry); 
+            deleteMatrix(newProductEntry); 
         });
         newProductEntry.appendChild(deleteButton);
         matchingLevel2.appendChild(newProductEntry);
     }
-    function deleteProduct(productEntry) {
+    function deleteMatrix(productEntry) {
         const matchingLevel2 = document.getElementById('matchingLevel2');
         matchingLevel2.removeChild(productEntry);  
     }

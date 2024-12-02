@@ -1,152 +1,243 @@
-{% comment %} <!DOCTYPE html>
-<html>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus and Profit Dashboard</title>
+
+    <!-- Google Charts Library -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        table { 
+
+        table {
             border-collapse: collapse;
             width: 80%;
             margin: auto;
+            margin-top: 20px;
         }
+
         th, td {
             padding: 10px;
             text-align: left;
             border: 1px solid #000;
         }
+
+        /* Flexbox Layout for Pie Chart and Graph */
+        .charts-container {
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            {% comment %} margin-top: 20px; {% endcomment %}
+        }
+
+        .chart-container {
+            margin: 20px auto;
+            width: 48%; /* Set each chart to take up 48% of the container width */
+            height: 500px;
+        }
+
+        .table-container {
+            margin: 20px auto;
+        }
+
+        .summary-container {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bonus and Profit Table</title>
 </head>
 <body>
-<div id="myChart" style="width:100%; max-width:600px; height:500px;"></div>
-<div id="mySecondChart" style="width:100%; max-width:600px; height:500px;"></div>
 
-<script>
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawCharts);
+    
 
-function drawCharts() {
-  
-  var totalSponsorBonus = {{results.total_sponsor_bonus}};  
-  var totalBinaryBonus =  {{results.total_binary_bonus}};
-  var totalMatchingBonus = {{results.total_matching_bonus}};
-  var totalProfitToCompany = {{results.totalProfitToCompany}};
-  var TotalExpense = {{results.TotalExpense}};
-  
-  const data1 = google.visualization.arrayToDataTable([
-    ['Category', 'Amount'],
-    ['Profit', totalProfitToCompany],
-    ['Expense', TotalExpense]
-  ]);
+    <!-- Pie Charts and Line Graph in Flexbox -->
+    <div class="charts-container">
+        <!-- First Pie Chart -->
+        <div class="chart-container" id="myChart"></div>
 
-  const options1 = {
-    title: 'Company Financials',
-    is3D: true,
-    pieSliceText: 'percentage', 
-    slices: {
-      0: {offset: 0.1}, 
-      1: {offset: 0.05} 
-    },
-    fontName: 'Arial',
-    fontSize: 14,
-    chartArea: {width: '90%', height: '80%'}
-  };
-  const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
-  chart1.draw(data1, options1);
+        <!-- Second Pie Chart -->
+        <div class="chart-container" id="mySecondChart"></div>
+    </div>
 
-  const data2 = google.visualization.arrayToDataTable([
-    ['Bonus Type', 'Amount'],
-    ['Sponsor Bonus', totalSponsorBonus],
-    ['Binary Bonus', totalBinaryBonus],
-    ['Matching Bonus', totalMatchingBonus]
-  ]);
+    <!-- Bonus Breakdown Line Chart (Chart.js) -->
+    <div style="height:40vh; margin: 20px auto;display: block;
+  box-sizing: border-box;
+  height: 700px;
+  width: 1200px;
+  margin: 20px auto;">
+        <canvas id="bonusChart"></canvas>
+    </div>
 
-  const options2 = {
-    title: 'Bonus Breakdown',
-    is3D: true,
-    pieSliceText: 'value', 
-    slices: {
-      0: {offset: 0.1, color: 'green'}, 
-      1: {offset: 0.05, color: 'Turquoise'},
-      2: {color: 'Violet'} 
-    },
-    fontName: 'Arial',
-    fontSize: 14,
-    chartArea: {width: '90%', height: '80%'} 
-  };
-  const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));
-  chart2.draw(data2, options2);
-}
-</script>
 
-<table>
-    <tr>
-        <th>No. of Members</th>
-        <td>{{ num_members }}</td> 
-    </tr>
-    <tr>
-        <th>Income from Joiing Package Purchase</th>
-        <td>{{ results.totalProfitToCompany }}</td> 
-    </tr>
-    <tr>
-        <th>Sponsor Bonus</th>
-        <td>{{ results.total_sponsor_bonus }}</td> 
-    </tr>
-    <tr>
-        <th>Binary Bonus</th>
-        <td>{{ results.total_binary_bonus }}</td> 
-    </tr>
-    <tr>
-        <th>Matching Bonus</th>
-        <td> {{ results.total_matching_bonus }}</td> 
-    </tr>
-    <tr>
-        <th>TOTAL PROFIT</th>
-        <td>{{ results.totalProfitToCompany }}</td> 
-    </tr>
-    <tr>
-        <th>TOTAL EXPENSE</th>
-        <td>{{ results.TotalExpense }}</td> 
-    </tr>
-</table>
 
+    <!-- Google Charts for Pie Charts -->
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            var totalSponsorBonus = {{ results.total_sponsor_bonus }};  
+            var totalBinaryBonus = {{ results.total_binary_bonus }};
+            var totalMatchingBonus = {{ results.total_matching_bonus }};
+            var totalProfitToCompany = {{ results.totalProfitToCompany }};
+            var TotalExpense = {{ results.TotalExpense }};
+            
+            const data1 = google.visualization.arrayToDataTable([
+                ['Category', 'Amount'],
+                ['Profit', totalProfitToCompany],
+                ['Expense', TotalExpense]
+            ]);
+
+            const options1 = {
+                title: 'Company Financials',
+                is3D: true,
+                pieSliceText: 'percentage', 
+                slices: {
+                    0: {offset: 0.1}, 
+                    1: {offset: 0.05} 
+                },
+                fontName: 'Arial',
+                fontSize: 14,
+                chartArea: {width: '90%', height: '80%'}
+            };
+
+            const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
+            chart1.draw(data1, options1);
+
+            const data2 = google.visualization.arrayToDataTable([
+                ['Bonus Type', 'Amount'],
+                ['Sponsor Bonus', totalSponsorBonus],
+                ['Binary Bonus', totalBinaryBonus],
+                ['Matching Bonus', totalMatchingBonus]
+            ]);
+
+            const options2 = {
+                title: 'Bonus Breakdown',
+                is3D: true,
+                pieSliceText: 'value', 
+                slices: {
+                    0: {offset: 0.1, color: 'green'}, 
+                    1: {offset: 0.05, color: 'Turquoise'},
+                    2: {color: 'Violet'} 
+                },
+                fontName: 'Arial',
+                fontSize: 14,
+                chartArea: {width: '90%', height: '80%'} 
+            };
+
+            const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));
+            chart2.draw(data2, options2);
+        }
+    </script>
+
+    <!-- Chart.js for Line Chart -->
+    <script>
+        const sponsorBonusData = {{ results.totalSPONSORBonus|safe }};
+        const binaryBonusData = {{ results.totalBINARYBonus|safe }};
+        const matchingBonusData = {{ results.totalMATCHINGBonus|safe }};
+
+        const chartData = {
+            datasets: [{
+                    label: 'Sponsor Bonus',
+                    data: sponsorBonusData,  
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                },
+                {
+                    label: 'Binary Bonus',
+                    data: binaryBonusData,  
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    fill: true
+                },
+                {
+                    label: 'Matching Bonus',
+                    data: matchingBonusData,  
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    fill: true
+                }
+            ]
+        };
+
+        const config = {
+            type: 'line', 
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Bonus Breakdown for Each Cycle'
+                    },
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                }
+            },
+        };
+
+        const ctx = document.getElementById('bonusChart').getContext('2d');
+        new Chart(ctx, config);
+    </script>
+   <!-- Summary Table -->
+   <div class="table-container">
+    <table>
+        <tr>
+            <th>No. of Members</th>
+            <td>{{ num_members }}</td> 
+        </tr>
+        <tr>
+            <th>Income from Joining Package Purchase</th>
+            <td>{{ results.totalProfitToCompany }}</td> 
+        </tr>
+        <tr>
+            <th>Sponsor Bonus</th>
+            <td>{{ results.total_sponsor_bonus }}</td> 
+        </tr>
+        <tr>
+            <th>Binary Bonus</th>
+            <td>{{ results.total_binary_bonus }}</td> 
+        </tr>
+        <tr>
+            <th>Matching Bonus</th>
+            <td>{{ results.total_matching_bonus }}</td> 
+        </tr>
+        <tr>
+            <th>TOTAL PROFIT</th>
+            <td>{{ results.totalProfitToCompany }}</td> 
+        </tr>
+        <tr>
+            <th>TOTAL EXPENSE</th>
+            <td>{{ results.TotalExpense }}</td> 
+        </tr>
+    </table>
+</div>
+    {% comment %} <div class="summary-container">
+        <p>Unilevel Sponsor Bonus: {{ results.totalUnilevelSponsorBonus }}</p>
+        <p>Unilevel Matching Bonus: {{ results.totalUnilevelMatchingBonus }}</p>
+        <p>Unilevel Expense: {{ results.TotalUnilevelExpense }}</p>
+        <p>Unilevel Profit to Company: {{ results.totalUnilevelProfitToCompany }}</p>
+        
+        <p>Matrix Sponsor Bonus: {{ results.CalculateMatrixSponsorBonus }}</p>
+        <p>Matrix Matching Bonus: {{ results.CalculateMatrixMatchingBonus }}</p>
+        <p>Matrix Profit to Company: {{ results.totalMatrixProfitToCompany }}</p>
+        <p>Matrix Expense: {{ results.TotalMatrixExpense }}</p>
+    </div> {% endcomment %}
 </body>
-</html> {% endcomment %}
- 
-<head>
-    <title>Unilevel</title>
-</head>
-<body>
-    <h1>Unilevel</h1>
-    
-    <p>{{results.totalUnilevelSponsorBonus}}</p></br>
-    <p>{{results.totalUnilevelMatchingBonus}}</p></br>
-
-    <p>{{results.TotalUnilevelExpense}}</p></br>
-    <p>{{results.totalUnilevelProfitToCompany}}</p></br>
-    
-    <p>{{results.totalUnilevelSPONSORBonus}}</p></br>
-    <p>{{results.totalUnilevelMATCHINGBonus}}</p>
-</body>  
-
-<head>
-    <title>Matrixlevel</title>
-</head>
-<body>
-    <h1>Matrixlevel</h1>
-    
-    <p>{{results.CalculateMatrixSponsorBonus}}</p></br>
-    <p>{{results.CalculateMatrixMatchingBonus}}</p></br>
-
-    <p>{{results.totalMatrixProfitToCompany}}</p></br>
-    <p>{{results.TotalMatrixExpense}}</p></br>
-    
-    <p>{{results.totalMatrixSPONSORBonus}}</p></br>
-    <p>{{results.totalMatrixMATCHINGBonus}}</p>
-    <p>{{results.stored_id}}</p>
-</body> 
+</html>
