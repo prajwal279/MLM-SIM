@@ -32,6 +32,7 @@ type TreeStructure struct {
 	LeftDownlineSale    float64
 	RightDownlineSale   float64
 	CycleProfit         float64
+	PoolBonus			float64
 }
 
 type TreeStructureJSON struct {
@@ -54,6 +55,7 @@ type TreeStructureJSON struct {
 	LeftDownlineSale    float64 `json:"LeftDownlineSale"`
 	RightDownlineSale   float64 `json:"RightDownlineSale"`
 	CycleProfit         float64 `json:"cycle_profit"`
+	PoolBonus			float64 `json:"pool_bonus"`
 }
 
 func convertToJSONStructure(nodes []*TreeStructure) []TreeStructureJSON {
@@ -89,6 +91,7 @@ func convertToJSONStructure(nodes []*TreeStructure) []TreeStructureJSON {
 			ParentID:            parentID,
 			SponsorBonus:        node.SponsorBonus,
 			BinaryBonus:         node.BinaryBonus,
+			PoolBonus:			 node.PoolBonus,
 			MatchingBonus:       node.MatchingBonus,
 			CycleProfit:         node.CycleProfit,
 			CarryForward:        node.CarryForward,
@@ -414,23 +417,35 @@ func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, to
 			iterant = 0
 		}
 		total := totalJoiningCycle[iterant] + list[0].SponsorBonus + list[0].BinaryBonus + list[0].MatchingBonus
+
 		iterant = iterant + 1
 		var expense float64
 		for _, member := range list {
 			if member.UserID > 1 {
 				expense = expense + ExpenseMembers + member.BinaryBonus + member.MatchingBonus + member.SponsorBonus
 			}
-			// member.CycleProfit = total
-			// cycleProfits += total
-			// totalProfit[i] += member.CycleProfit
 		}
 		profit := total - expense
 		cycleProfits = cycleProfits + profit
 		totalProfit[i] = profit
 	}
-	fmt.Println("000000000", cycleProfits, totalProfit)
 	return cycleProfits, totalProfit
 }
+
+func CalculatePoolBonus(all_Data [][]*TreeStructure, totalProfit map[int]float64, pool_perc float64, dist_no int) (float64, map[int]float64) {
+	fmt.Println("////",totalProfit)
+	var pool_amount float64
+    PoolAmount := make(map[int]float64)
+
+	for i := range totalProfit{
+		PoolAmount[i] = totalProfit[i]*pool_perc/100
+		totalProfit[i] = totalProfit[i] - PoolAmount[i]
+		pool_amount = pool_amount + PoolAmount[i]
+	}
+    return pool_amount, PoolAmount
+}
+
+
 
 func buildUnilevelTree(root *TreeStructure, numMembers int, startID int, numChild int) []*TreeStructure {
 	if numMembers <= 0 {
@@ -810,6 +825,16 @@ func main() {
 			http.Error(w, "Invalid or missing 'num_members' field", http.StatusBadRequest)
 			return
 		}
+		PoolPerc, ok := data["pool_percentage"].(float64)
+		if !ok {
+			http.Error(w, "Invalid or missing 'pool_percentage' field", http.StatusBadRequest)
+			return
+		}
+		DistNo, ok := data["dist_member"].(float64)
+		if !ok {
+			http.Error(w, "Invalid or missing 'dist_member' field", http.StatusBadRequest)
+			return
+		}	
 		ExpenseMembers, ok := data["expense_per_user"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'expense_per_user' field", http.StatusBadRequest)
@@ -929,6 +954,7 @@ func main() {
 					RightCarry:          member.RightCarry,
 					LeftDownlineSale:    member.LeftDownlineSale,
 					RightDownlineSale:   member.RightDownlineSale,
+					PoolBonus:			 member.PoolBonus,
 				}
 				if copiedMember.LeftMember != nil {
 					if copiedMember.LeftMember.UserID > len(list) {
@@ -954,7 +980,8 @@ func main() {
 		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount)
 		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
 		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus
-		totalProfitToCompany, totalJoiningCycle := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
+		totalProfitToCompany, totalProfit := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
+		totalPoolBonus, totalPOOLBonus := CalculatePoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 
 		var treeNodes [][]TreeStructureJSON
 		for _, list := range cycleList {
@@ -964,7 +991,7 @@ func main() {
 
 		results := map[string]interface{}{
 			"totalProfitToCompany": totalProfitToCompany,
-			"totalJoiningCycle":    totalJoiningCycle,
+			"totalProfit":    		totalProfit,
 			"TotalExpense":         TotalExpense,
 			"treeNodes":            treeNodes,
 			"stored_id":            stored_id,
@@ -975,6 +1002,8 @@ func main() {
 			"totalSPONSORBonus":    totalSPONSORBonus,
 			"totalBINARYBonus":     totalBINARYBonus,
 			"totalMATCHINGBonus":   totalMATCHINGBonus,
+			"totalPoolBonus":		totalPoolBonus,
+			"totalPOOLBonus":		totalPOOLBonus,
 		}
 		sendResultsToDjango(results)
 

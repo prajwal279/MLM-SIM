@@ -141,17 +141,14 @@
             <div class="col-md-6">
                 <label for="numMembers" class="form-label">No of Members</label>
                 <input type="number" class="form-control" id="numUsers" name="num_members" placeholder="Enter number of users">
-                {% comment %} {{ form.num_members }} {% endcomment %}
             </div>
             <div class="col-md-6">
                 <label for="cycle" class="form-label">Cycle</label>
-                {% comment %} <input type="number" class="form-control" id="CYCLE_COUNT" name="cycle" placeholder="No of cycles"> {% endcomment %}
                 {{ form.cycle }}
             </div>
             <div class="col-md-6">
                 <label for="cycle" class="form-label">Expense per user</label>
                 <input type="number" class="form-control"  name="expense_per_user" placeholder="Enter expense per user">
-                {% comment %} {{ form.expense_per_user }} {% endcomment %}
             </div>
         </div>
 
@@ -288,6 +285,21 @@
             </div>
         </div>
         
+        <div id="productContainer" >
+            {% csrf_token %}
+            <div class="row g-3">
+                <h5>Pool Pairing Bonus Calculation</h5>
+                <div class="col-md-6">
+                    <label  class="form-label">Pool member count</label>
+                    <input type="number" class="form-control" name="dist_member" placeholder="Enter Pool member Count">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Pool Bonus Percentage</label>
+                    <input type="number" class="form-control"  name="pool_percentage" placeholder="Enter Pool Bonus Percentage">
+                </div>
+            </div>
+        </div>
+
         <div class="plan-card mt-4 p-4">
             <div class="row g-3">
                 <div class="col-md-6">

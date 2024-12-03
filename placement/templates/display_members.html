@@ -89,6 +89,7 @@
             var totalSponsorBonus = {{ results.total_sponsor_bonus }};  
             var totalBinaryBonus = {{ results.total_binary_bonus }};
             var totalMatchingBonus = {{ results.total_matching_bonus }};
+            var totalPoolBonus = {{ results.totalPoolBonus }};
             var totalProfitToCompany = {{ results.totalProfitToCompany }};
             var TotalExpense = {{ results.TotalExpense }};
             
@@ -104,8 +105,8 @@
                 is3D: true,
                 pieSliceText: 'percentage', 
                 slices: {
-                    0: {offset: 0.1, color: '#66bb6a'}, // Green for Profit
-                    1: {offset: 0.05, color: '#f44336'} // Red for Expense
+                    0: {offset: 0.1, color: '#66bb6a'},
+                    1: {offset: 0.05, color: '#f44336'} 
                 },
                 fontName: 'Arial',
                 fontSize: 14,
@@ -136,7 +137,8 @@
                 ['Bonus Type', 'Amount'],
                 ['Sponsor Bonus', totalSponsorBonus],
                 ['Binary Bonus', totalBinaryBonus],
-                ['Matching Bonus', totalMatchingBonus]
+                ['Matching Bonus', totalMatchingBonus],
+                ['Pool Bonus', totalPoolBonus]
             ]);
     
             const options2 = {
@@ -144,9 +146,10 @@
                 is3D: true,
                 pieSliceText: 'percentage', 
                 slices: {
-                    0: {offset: 0.1, color: 'green'},
+                    0: {offset: 0.1, color: 'lightgreen'},
                     1: {offset: 0.05, color: 'turquoise'},
-                    2: {color: 'violet'}
+                    2: {color: 'violet'},
+                    3: {color: 'hotpink'}
                 },
                 fontName: 'Arial',
                 fontSize: 14,
@@ -156,8 +159,8 @@
                     duration: 1000,
                     easing: 'inAndOut'
                 },
-                tooltip: {trigger: 'selection'}, // Show more info when hovering over slices
-                sliceVisibilityThreshold: 0.05 // Only show slices with more than 5% share
+                tooltip: {trigger: 'selection'},
+                sliceVisibilityThreshold: 0.05 
             };
     
             const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));
@@ -166,35 +169,45 @@
     </script>
     
 
-    <!-- Chart.js for Line Chart -->
     <script>
         const sponsorBonusData = {{ results.totalSPONSORBonus|safe }};
         const binaryBonusData = {{ results.totalBINARYBonus|safe }};
         const matchingBonusData = {{ results.totalMATCHINGBonus|safe }};
+        const poolBonusData = {{ results.totalPOOLBonus|safe }};
+
 
         const chartData = {
-            datasets: [{
+            datasets: [
+                {
                     label: 'Sponsor Bonus',
                     data: sponsorBonusData,  
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',  // Teal color
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light Teal
                     fill: true
                 },
                 {
                     label: 'Binary Bonus',
                     data: binaryBonusData,  
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',  // Red color
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',  // Light Red
                     fill: true
                 },
                 {
                     label: 'Matching Bonus',
                     data: matchingBonusData,  
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',  // Blue color
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',  // Light Blue
+                    fill: true
+                },
+                {
+                    label: 'Pool Bonus',
+                    data: poolBonusData,  
+                    borderColor: 'rgba(255, 159, 64, 1)',  // Orange color
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',  // Light Orange
                     fill: true
                 }
             ]
+
         };
 
         const config = {

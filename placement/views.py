@@ -6,11 +6,12 @@ import requests
 from .forms import MemberForm
  
 def build_new_tree(request):
-    print(request.POST)
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
+            dist_member = form.cleaned_data['dist_member']
+            pool_percentage = form.cleaned_data['pool_percentage']
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0])
@@ -33,6 +34,8 @@ def build_new_tree(request):
             ratio_amount = form.cleaned_data['ratio_amount']
             data = {
                 "num_members": num_members,
+                "dist_member": dist_member,
+                "pool_percentage": pool_percentage,
                 "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
                 "sponsor_percentage": sponsor_bonus_percent,
@@ -48,6 +51,7 @@ def build_new_tree(request):
                 "ratio":ratio,
                 "ratio_amount":ratio_amount,
             }
+            print(data)
             try:
                 response = requests.post('http://localhost:9000/calculate', json=data)
                 response.raise_for_status() 
