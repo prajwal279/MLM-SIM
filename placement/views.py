@@ -6,13 +6,20 @@ import requests
 from .forms import MemberForm
  
 def build_new_tree(request):
+    print(request.POST)
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
-            sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0])
+            sponsor_bonus_percent = sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0])
+            # sponsor_bonus_percent = sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[1])
+            # if len(sponsor_bonus_percent_list) > 1:
+            #     sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[1])
+            # else:
+            #     sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0])
+      
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
             joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
             b_volume = [int(level.strip()) for level in request.POST.getlist('b_v', '') if level.strip().isdigit()]
@@ -63,7 +70,7 @@ def build_new_tree(request):
 
 
 def build_unilevel_tree(request):
-    print(request.POST)
+    
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
@@ -71,7 +78,7 @@ def build_unilevel_tree(request):
             num_child = int(request.POST.getlist('num_child')[0])
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
-            sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[1])
+            sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[2])
             joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
             bonus_option = form.cleaned_data['bonus_option']
             capping_limit = form.cleaned_data['capping_limit']

@@ -186,41 +186,62 @@
             <div class="row g-3">
                 <div class="col-md-6 d-flex align-items-end">
                     <div class="btn-group w-100" role="group">
-                        <button type="button" class="btn btn-primary active" id="binaryBtn">WEEK LEG</button>
-                        <button type="button" class="btn btn-primary" id="unilevelBtn">PAIRING</button>
+                        <button type="button" class="btn btn-primary active" id="weekleg" value="weekleg_value">WEEK LEG</button>
+                        <button type="button" class="btn btn-primary" id="pairing" value="pairing_value">PAIRING</button>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <label for="binaryPercentage" class="form-label">Binary Percentage</label>
-                    {% comment %} {{ form.binary_bonus_percent }} {% endcomment %}
-                    <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
-                </div>
-                <div class="col-md-4">
-                    <label for="binaryRatio" class="form-label">Ratio</label>
-                    {{ form.ratio }}
-                    {% comment %} <input type="text" class="form-control" name="ratio" id="binaryRatio" placeholder="e.g., 1:1"> {% endcomment %}
-                </div>
-                <div class="col-md-4">
-                    <label for="binaryRatio" class="form-label">Ratio Amount</label>
-                    <input type="text" class="form-control" name="{{ form.ratio_amount.name }}" id="id_ratio_amount" placeholder="Ratio Amount">
-                    {% comment %} <input type="text" class="form-control" name="ratio_amount" id="binaryRatio" placeholder="ratio amount"> {% endcomment %}
-                </div>
-                <div class="col-md-4">
-                    <label for="binaryOption" class="form-label">Bonus Option</label>
-                    {{ form.bonus_option }}
-                </div>
-                <div class="col-md-6">
-                    <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    {% comment %} {{ form.sponsor_bonus_percent }} {% endcomment %}
-                    <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
-                </div>
-                <div id="matchingLevel">
+                <div id="weeklegForm" class="plan-card hidden mt-4">   
+                    <div class="col-md-4">
+                        <label for="binaryPercentage" class="form-label">Binary Percentage</label>
+                        <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="binaryOption" class="form-label">Bonus Option</label>
+                        {{ form.bonus_option }}
+                    </div>
                     <div class="col-md-6">
-                        <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                        <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                        <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                     </div>
-                </div>
-                <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
+                    <div id="matchingLevel">
+                        <div class="col-md-6">
+                            <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
+                            <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
+                </div>     
+
+                <div id="pairingForm" class="plan-card hidden mt-4">   
+                    <div class="col-md-4">
+                        <label for="binaryPercentage" class="form-label">Binary Percentage</label>
+                        <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="binaryRatio" class="form-label">Ratio</label>
+                        {{ form.ratio }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="binaryRatio" class="form-label">Ratio Amount</label>
+                        <input type="text" class="form-control" name="{{ form.ratio_amount.name }}" id="id_ratio_amount" placeholder="Ratio Amount">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="binaryOption" class="form-label">Bonus Option</label>
+                        {{ form.bonus_option }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                    </div>
+                    <div id="matchingLevel3">
+                        <div class="col-md-6">
+                            <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
+                            <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3 w-25" onclick="addMatchingPairing()">+Add Level</button>
+                </div>   
+
             </div>
         </div>
 
@@ -360,7 +381,7 @@
             deleteMatrix(newProductEntry); 
         });
         newProductEntry.appendChild(deleteButton);
-        matchingLevel2.appendChild(newProductEntry);
+        matchingLevel2.appendChild(newProductEntry)
     }
     function deleteMatrix(productEntry) {
         const matchingLevel2 = document.getElementById('matchingLevel2');
@@ -378,6 +399,37 @@
         });
     });  
 
+
+    function addMatchingPairing() {
+        event.preventDefault();
+        const matchingLevel3 = document.getElementById('matchingLevel3');
+        const newProductEntry = matchingLevel3.firstElementChild.cloneNode(true);
+        newProductEntry.querySelectorAll('input').forEach(input => input.value = '');
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.type = 'button';  
+        deleteButton.classList.add('delete-btn');  
+        deleteButton.addEventListener('click', function() {
+            deleteMatrixPairing(newProductEntry); 
+        });
+        newProductEntry.appendChild(deleteButton);
+        matchingLevel3.appendChild(newProductEntry)
+    }
+    const m1 = document.querySelectorAll('.btn-primary');
+    m1.forEach(button => {
+        button.addEventListener('click', () => {
+           
+            m1.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            console.log(`${button.innerText} clicked`);
+        });
+    });  
+     function deleteMatrixPairing(productEntry) {
+        const matchingLevel3 = document.getElementById('matchingLevel3');
+        matchingLevel3.removeChild(productEntry);  
+    }
+    
 
     function addUnilevelMatching() {
         event.preventDefault(); 
@@ -425,18 +477,40 @@
     });
     document.getElementById('matrixBtn').addEventListener('click', function() {
         toggleForms('matrixForm');
-        document.getElementById("mlmCalculator").action = "{% url 'build_matrix_tree' %}"
+        document.getElementBtoggleFormsyId("mlmCalculator").action = "{% url 'build_matrix_tree' %}"
+    });
+
+    document.getElementById('weekleg').addEventListener('click', function() {
+        document.getElementById('weeklegForm').classList.remove('hidden');
+        document.getElementById('pairingForm').classList.add('hidden');
+        document.getElementById("sponsor_bonus_percent".value) = "weekleg_value";
+        var ratioInput = document.getElementById('id_ratio_0');
+        if (ratioInput) {
+            ratioInput.checked = true;
+        }
+        var ratioAmountInput = document.getElementById("id_ratio_amount");
+        if (ratioAmountInput) {
+            ratioAmountInput.value = 1.0;
+        }
+    });
+
+    document.getElementById('pairing').addEventListener('click', function() {
+        document.getElementById('pairingForm').classList.remove('hidden');
+        document.getElementById('weeklegForm').classList.add('hidden');
+        document.getElementById("sponsor_bonus_percent".value) = "pairing_value"; 
     });
 
     function toggleForms(formId) {
-        // Hide all forms
         document.getElementById('binaryForm').classList.add('hidden');
         document.getElementById('unilevelForm').classList.add('hidden');
         document.getElementById('matrixForm').classList.add('hidden');
+        document.getElementById('weeklegForm').classList.add('hidden');
+        document.getElementById('pairingForm').classList.add('hidden');
         
         // Show the selected form
         document.getElementById(formId).classList.remove('hidden');
     }
+
 
     document.getElementById('simulateBtn').addEventListener('click', function() {
         // Grab all the input values
@@ -463,7 +537,7 @@
         // Capping limit values
         const cappingLimit = document.getElementById('cappingLimit').value;
         const binaryBonusChecked = document.getElementById('binaryBonus').checked;
-        const sponsorBonusChecked = document.getElementById('sponsorBonusScope').checked;
+        const sponsorBonusChecked = document.getElementBweeklegId('sponsorBonusScope').checked;
         const matchingBonusChecked = document.getElementById('matchingBonusScope').checked;
 
         // Create the result message
@@ -493,8 +567,7 @@
 
         resultMessage += `<strong>Capping Scope:</strong><br> Binary Bonus: ${binaryBonusChecked ? 'Yes' : 'No'}<br> Sponsor Bonus: ${sponsorBonusChecked ? 'Yes' : 'No'}<br> Matching Bonus: ${matchingBonusChecked ? 'Yes' : 'No'}<br>`;
 
-        // Show result in an alert or in a specific div
-        alert(resultMessage); // Or replace this line to show results in a div
+        alert(resultMessage);
     });
 </script>
 

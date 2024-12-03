@@ -41,7 +41,7 @@
 
         .chart-container {
             margin: 20px auto;
-            width: 48%; /* Set each chart to take up 48% of the container width */
+            width: 48%;
             height: 500px;
         }
 
@@ -77,13 +77,14 @@
         <canvas id="bonusChart"></canvas>
     </div>
 
-
+    
+    
 
     <!-- Google Charts for Pie Charts -->
     <script>
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawCharts);
-
+    
         function drawCharts() {
             var totalSponsorBonus = {{ results.total_sponsor_bonus }};  
             var totalBinaryBonus = {{ results.total_binary_bonus }};
@@ -91,53 +92,79 @@
             var totalProfitToCompany = {{ results.totalProfitToCompany }};
             var TotalExpense = {{ results.TotalExpense }};
             
+            // First Pie Chart: Company Financials
             const data1 = google.visualization.arrayToDataTable([
                 ['Category', 'Amount'],
                 ['Profit', totalProfitToCompany],
                 ['Expense', TotalExpense]
             ]);
-
+    
             const options1 = {
                 title: 'Company Financials',
                 is3D: true,
                 pieSliceText: 'percentage', 
                 slices: {
-                    0: {offset: 0.1}, 
-                    1: {offset: 0.05} 
+                    0: {offset: 0.1, color: '#66bb6a'}, // Green for Profit
+                    1: {offset: 0.05, color: '#f44336'} // Red for Expense
                 },
                 fontName: 'Arial',
                 fontSize: 14,
-                chartArea: {width: '90%', height: '80%'}
+                chartArea: {width: '90%', height: '80%'},
+                animation: {
+                    startup: true,
+                    duration: 1000,
+                    easing: 'inAndOut'
+                },
+                tooltip: {trigger: 'selection'}, // Display more info on hover
+                sliceVisibilityThreshold: 0.05 // Only show slices with more than 5% share
             };
-
+    
             const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
             chart1.draw(data1, options1);
-
+            
+            google.visualization.events.addListener(chart1, 'select', function() {
+                const selection = chart1.getSelection();
+                if (selection.length > 0) {
+                    const row = selection[0].row;
+                    const sliceLabel = data1.getValue(row, 0);
+                    const sliceValue = data1.getValue(row, 1);
+                    console.log('Selected slice: ' + sliceLabel + ' with value: ' + sliceValue);
+                }
+            });
+            // Second Pie Chart: Bonus Breakdown
             const data2 = google.visualization.arrayToDataTable([
                 ['Bonus Type', 'Amount'],
                 ['Sponsor Bonus', totalSponsorBonus],
                 ['Binary Bonus', totalBinaryBonus],
                 ['Matching Bonus', totalMatchingBonus]
             ]);
-
+    
             const options2 = {
                 title: 'Bonus Breakdown',
                 is3D: true,
-                pieSliceText: 'value', 
+                pieSliceText: 'percentage', 
                 slices: {
-                    0: {offset: 0.1, color: 'green'}, 
-                    1: {offset: 0.05, color: 'Turquoise'},
-                    2: {color: 'Violet'} 
+                    0: {offset: 0.1, color: 'green'},
+                    1: {offset: 0.05, color: 'turquoise'},
+                    2: {color: 'violet'}
                 },
                 fontName: 'Arial',
                 fontSize: 14,
-                chartArea: {width: '90%', height: '80%'} 
+                chartArea: {width: '90%', height: '80%'},
+                animation: {
+                    startup: true,
+                    duration: 1000,
+                    easing: 'inAndOut'
+                },
+                tooltip: {trigger: 'selection'}, // Show more info when hovering over slices
+                sliceVisibilityThreshold: 0.05 // Only show slices with more than 5% share
             };
-
+    
             const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));
             chart2.draw(data2, options2);
         }
     </script>
+    
 
     <!-- Chart.js for Line Chart -->
     <script>
