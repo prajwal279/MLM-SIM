@@ -220,6 +220,15 @@
                         display: true,
                         text: 'Bonus Breakdown for Each Cycle'
                     },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.label || '';
+                                const value = tooltipItem.raw || 0;
+                                return `${label}: ${value.toLocaleString()}`;
+                            }
+                        }
+                    },
                     legend: {
                         position: 'top',
                     },
@@ -235,7 +244,7 @@
         const ctx = document.getElementById('bonusChart').getContext('2d');
         new Chart(ctx, config);
     </script>
-   <!-- Summary Table -->
+    
    <div class="table-container">
     <table>
         <tr>

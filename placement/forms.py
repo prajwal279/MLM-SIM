@@ -5,7 +5,7 @@ class MemberForm(forms.Form):
     dist_member = forms.IntegerField(label="Pool Limit",min_value=1, required=False)
     pool_percentage = forms.FloatField(label="Pool Bonus (%)", min_value=0, required=False)
     num_child = forms.IntegerField(label="No Of Children",min_value=1, required=False)
-    expense_per_user = forms.IntegerField(label="expense per user",min_value=1, required=False)
+    expense_per_user = forms.FloatField(label="expense per user",min_value=0, required=False)
     product_name = forms.CharField(max_length=255, required=False)
     joining_package_fee = forms.CharField(max_length=255, required=False)
     b_v = forms.CharField(max_length=255, required=False, initial='0')  

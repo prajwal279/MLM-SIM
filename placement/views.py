@@ -7,12 +7,14 @@ from .forms import MemberForm
  
 def build_new_tree(request):
     if request.method == 'POST':
+        print(request.POST)
         form = MemberForm(request.POST) 
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
             dist_member = form.cleaned_data['dist_member']
             pool_percentage = form.cleaned_data['pool_percentage']
-            expense_per_user = form.cleaned_data['expense_per_user']
+            # expense_per_user = form.cleaned_data['expense_per_user'] 
+            expense_per_user = float(request.POST.get('expense_per_user') or 0)
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0]) if request.POST.getlist('sponsor_bonus_percent')[0]!="" else float(request.POST.getlist('sponsor_bonus_percent')[1])
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
@@ -102,13 +104,12 @@ def build_unilevel_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
-            print("1",data)
             try:
                 response = requests.post('http://localhost:9000/unilevel', json=data)
                 response.raise_for_status() 
 
                 results = response.json()  
-                return render(request, 'display_members.html', {
+                return render(request, 'unilevel.html', {
                     'results': results,
                     'num_members':num_members,
                 })
@@ -156,13 +157,12 @@ def build_matrix_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
-            print("1",data)
             try:
                 response = requests.post('http://localhost:9000/matrix', json=data)
                 response.raise_for_status() 
 
                 results = response.json()  
-                return render(request, 'display_members.html', {
+                return render(request, 'matrix.html', {
                     'results': results,
                     'num_members':num_members,
                 })

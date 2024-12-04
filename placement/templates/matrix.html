@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bonus and Profit Dashboard</title>
 
-    <!-- Google Charts Library -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-    <!-- Chart.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -30,13 +27,11 @@
             border: 1px solid #000;
         }
 
-        /* Flexbox Layout for Pie Chart and Graph */
         .charts-container {
             margin: 20px auto;
             display: flex;
             justify-content: space-between;
             gap: 20px;
-            {% comment %} margin-top: 20px; {% endcomment %}
         }
 
         .chart-container {
@@ -57,18 +52,12 @@
 </head>
 <body>
 
-    
-
-    <!-- Pie Charts and Line Graph in Flexbox -->
     <div class="charts-container">
-        <!-- First Pie Chart -->
+        
         <div class="chart-container" id="myChart"></div>
-
-        <!-- Second Pie Chart -->
         <div class="chart-container" id="mySecondChart"></div>
     </div>
 
-    <!-- Bonus Breakdown Line Chart (Chart.js) -->
     <div style="height:40vh; margin: 20px auto;display: block;
   box-sizing: border-box;
   height: 700px;
@@ -80,20 +69,19 @@
     
     
 
-    <!-- Google Charts for Pie Charts -->
+
     <script>
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawCharts);
     
         function drawCharts() {
-            var totalSponsorBonus = {{ results.total_sponsor_bonus }};  
-            var totalBinaryBonus = {{ results.total_binary_bonus }};
-            var totalMatchingBonus = {{ results.total_matching_bonus }};
+            var totalSponsorBonus = {{ results.CalculateMatrixSponsorBonus }};  
+            var totalMatchingBonus = {{ results.CalculateMatrixMatchingBonus }};
             var totalPoolBonus = {{ results.totalPoolBonus }};
-            var totalProfitToCompany = {{ results.totalProfitToCompany }};
-            var TotalExpense = {{ results.TotalExpense }};
+            var totalProfitToCompany = {{ results.totalMatrixProfitToCompany }};
+            var TotalExpense = {{ results.TotalMatrixExpense }};
             
-            // First Pie Chart: Company Financials
+        
             const data1 = google.visualization.arrayToDataTable([
                 ['Category', 'Amount'],
                 ['Profit', totalProfitToCompany],
@@ -116,8 +104,8 @@
                     duration: 1000,
                     easing: 'inAndOut'
                 },
-                tooltip: {trigger: 'selection'}, // Display more info on hover
-                sliceVisibilityThreshold: 0.05 // Only show slices with more than 5% share
+                tooltip: {trigger: 'selection'},
+                sliceVisibilityThreshold: 0.05 
             };
     
             const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
@@ -136,7 +124,6 @@
             const data2 = google.visualization.arrayToDataTable([
                 ['Bonus Type', 'Amount'],
                 ['Sponsor Bonus', totalSponsorBonus],
-                ['Binary Bonus', totalBinaryBonus],
                 ['Matching Bonus', totalMatchingBonus],
                 ['Pool Bonus', totalPoolBonus]
             ]);
@@ -170,9 +157,8 @@
     
 
     <script>
-        const sponsorBonusData = {{ results.totalSPONSORBonus|safe }};
-        const binaryBonusData = {{ results.totalBINARYBonus|safe }};
-        const matchingBonusData = {{ results.totalMATCHINGBonus|safe }};
+        const sponsorBonusData = {{ results.totalMatrixSPONSORBonus|safe }};
+        const matchingBonusData = {{ results.totalMatrixMATCHINGBonus|safe }};
         const poolBonusData = {{ results.totalPOOLBonus|safe }};
 
 
@@ -183,13 +169,6 @@
                     data: sponsorBonusData,  
                     borderColor: 'rgba(75, 192, 192, 1)',  // Teal color
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light Teal
-                    fill: true
-                },
-                {
-                    label: 'Binary Bonus',
-                    data: binaryBonusData,  
-                    borderColor: 'rgba(255, 99, 132, 1)',  // Red color
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',  // Light Red
                     fill: true
                 },
                 {
@@ -243,28 +222,20 @@
             <td>{{ num_members }}</td> 
         </tr>
         <tr>
-            <th>Income from Joining Package Purchase</th>
-            <td>{{ results.totalProfitToCompany }}</td> 
-        </tr>
-        <tr>
             <th>Sponsor Bonus</th>
-            <td>{{ results.total_sponsor_bonus }}</td> 
-        </tr>
-        <tr>
-            <th>Binary Bonus</th>
-            <td>{{ results.total_binary_bonus }}</td> 
+            <td>{{ results.CalculateMatrixSponsorBonus }}</td> 
         </tr>
         <tr>
             <th>Matching Bonus</th>
-            <td>{{ results.total_matching_bonus }}</td> 
+            <td>{{ results.CalculateMatrixMatchingBonus }}</td> 
         </tr>
         <tr>
             <th>TOTAL PROFIT</th>
-            <td>{{ results.totalProfitToCompany }}</td> 
+            <td>{{ results.totalMatrixProfitToCompany }}</td> 
         </tr>
         <tr>
             <th>TOTAL EXPENSE</th>
-            <td>{{ results.TotalExpense }}</td> 
+            <td>{{ results.TotalMatrixExpense }}</td> 
         </tr>
     </table>
 </div>
