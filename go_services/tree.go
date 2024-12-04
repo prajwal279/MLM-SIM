@@ -273,8 +273,10 @@ func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float
 			}
 
 			member.SponsorBonus = bonus
-			TSB += bonus
-			totalBonus[i] += bonus
+			if member.UserID != 1 {
+				TSB += bonus
+				totalBonus[i] += bonus
+			}
 		}
 	}
 	return TSB, totalBonus
@@ -301,7 +303,7 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 	totalBonus := make(map[int]float64)
 	b1 := 10.0
 	b2 := 15.0
-	b3 := 20.0
+	// b3 := 20.0
 	for i, nodeList := range allData {
 		for _, node := range nodeList {
 			if i != 0 && node.UserID < len(allData[i-1]) {
@@ -349,7 +351,7 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 			case noOfPairs > 5 && noOfPairs <= 10 && binaryPercentage != 0:
 				bonusPerc = b2
 			case noOfPairs > 10 && binaryPercentage != 0:
-				bonusPerc = b3
+				bonusPerc = b1
 			default:
 				bonusPerc = binaryPercentage
 			}
@@ -362,8 +364,10 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 				}
 			}
 			node.BinaryBonus = float64(nodeBonus)
-			TBB += node.BinaryBonus
-			totalBonus[i] += node.BinaryBonus
+			if node.UserID != 1 {
+				TBB += node.BinaryBonus
+				totalBonus[i] += node.BinaryBonus
+			}
 		}
 	}
 	return TBB, totalBonus
@@ -388,8 +392,10 @@ func CalculateMatchingBonus(allData [][]*TreeStructure, matchingPercentages []fl
 			if strings.Contains(cappingScope, "matching") && member.MatchingBonus > cappingAmount {
 				member.MatchingBonus = cappingAmount
 			}
-			TMB += member.MatchingBonus
-			totalBonus[i] += member.MatchingBonus
+			if member.UserID != 1 {
+				TMB += member.MatchingBonus
+				totalBonus[i] += member.MatchingBonus
+			}
 		}
 	}
 	return TMB, totalBonus
@@ -872,7 +878,7 @@ func main() {
 			return
 		}
 
-		fmt.Println("Received data:", data)
+		// fmt.Println("Received data:", data)
 		numMembers, ok := data["num_members"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'num_members' field", http.StatusBadRequest)
@@ -1036,9 +1042,14 @@ func main() {
 		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope, bonusOption)
 		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount, binaryPercentage)
 		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
+		fmt.Println("Expense Member:", ExpenseMembers)
+		fmt.Println("Total Hoining Cycle:", totalJoiningCycle)
 		totalProfitToCompany, totalProfit := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
 		totalPoolBonus, totalPOOLBonus := CalculatePoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus + totalPoolBonus
+
+		fmt.Println("Total Profit:", totalProfitToCompany)
+		fmt.Println("Cycle Profit:", totalProfit)
 
 		// var treeNodes [][]TreeStructureJSON
 		// for _, list := range cycleList {
