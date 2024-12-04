@@ -14,13 +14,7 @@ def build_new_tree(request):
             pool_percentage = form.cleaned_data['pool_percentage']
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
-            sponsor_bonus_percent = sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0])
-            # sponsor_bonus_percent = sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[1])
-            # if len(sponsor_bonus_percent_list) > 1:
-            #     sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[1])
-            # else:
-            #     sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0])
-      
+            sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0]) if request.POST.getlist('sponsor_bonus_percent')[0]!="" else float(request.POST.getlist('sponsor_bonus_percent')[1])
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
             joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
             b_volume = [int(level.strip()) for level in request.POST.getlist('b_v', '') if level.strip().isdigit()]
@@ -80,6 +74,8 @@ def build_unilevel_tree(request):
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
             num_child = int(request.POST.getlist('num_child')[0])
+            dist_member = form.cleaned_data['dist_member']
+            pool_percentage = form.cleaned_data['pool_percentage']
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[2])
@@ -92,6 +88,8 @@ def build_unilevel_tree(request):
             product_quantity = [int(level.strip()) for level in request.POST.getlist('product_quantity', '') if level.strip().isdigit()]
             data = {
                 "num_members": num_members,
+                "dist_member": dist_member,
+                "pool_percentage": pool_percentage,
                 "num_child": num_child,
                 "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
@@ -104,6 +102,7 @@ def build_unilevel_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
+            print("1",data)
             try:
                 response = requests.post('http://localhost:9000/unilevel', json=data)
                 response.raise_for_status() 
@@ -124,12 +123,13 @@ def build_unilevel_tree(request):
 
 
 def build_matrix_tree(request):
-    print(request.POST)
     if request.method == 'POST':
         form = MemberForm(request.POST) 
         if form.is_valid():
             num_members = form.cleaned_data['num_members']
             num_child = form.cleaned_data['num_child']
+            dist_member = form.cleaned_data['dist_member']
+            pool_percentage = form.cleaned_data['pool_percentage']
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = form.cleaned_data['sponsor_bonus_percent']
@@ -142,6 +142,8 @@ def build_matrix_tree(request):
             product_quantity = [int(level.strip()) for level in request.POST.getlist('product_quantity', '') if level.strip().isdigit()]
             data = {
                 "num_members": num_members,
+                "dist_member": dist_member,
+                "pool_percentage": pool_percentage,
                 "num_child": num_child,
                 "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
@@ -154,6 +156,7 @@ def build_matrix_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
+            print("1",data)
             try:
                 response = requests.post('http://localhost:9000/matrix', json=data)
                 response.raise_for_status() 

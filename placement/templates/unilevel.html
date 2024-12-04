@@ -36,7 +36,6 @@
             display: flex;
             justify-content: space-between;
             gap: 20px;
-            {% comment %} margin-top: 20px; {% endcomment %}
         }
 
         .chart-container {
@@ -59,16 +58,12 @@
 
     
 
-    <!-- Pie Charts and Line Graph in Flexbox -->
     <div class="charts-container">
-        <!-- First Pie Chart -->
         <div class="chart-container" id="myChart"></div>
 
-        <!-- Second Pie Chart -->
         <div class="chart-container" id="mySecondChart"></div>
     </div>
 
-    <!-- Bonus Breakdown Line Chart (Chart.js) -->
     <div style="height:40vh; margin: 20px auto;display: block;
   box-sizing: border-box;
   height: 700px;
@@ -79,8 +74,6 @@
 
     
     
-
-    <!-- Google Charts for Pie Charts -->
     <script>
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawCharts);
