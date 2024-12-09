@@ -303,7 +303,7 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 	totalBonus := make(map[int]float64)
 	b1 := 10.0
 	b2 := 15.0
-	// b3 := 20.0
+	b3 := 20.0
 	for i, nodeList := range allData {
 		for _, node := range nodeList {
 			if i != 0 && node.UserID < len(allData[i-1]) {
@@ -341,7 +341,6 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 
 			node.LeftCarry = carryLeft
 			node.RightCarry = carryRight
-
 			minimumVal := int(math.Min(float64(noOfPairs*left), float64(noOfPairs*right)))
 
 			var bonusPerc float64
@@ -351,10 +350,12 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 			case noOfPairs > 5 && noOfPairs <= 10 && binaryPercentage != 0:
 				bonusPerc = b2
 			case noOfPairs > 10 && binaryPercentage != 0:
-				bonusPerc = b1
+				bonusPerc = b3
 			default:
 				bonusPerc = binaryPercentage
 			}
+			fmt.Println("BP", binaryPercentage)
+			fmt.Println("---", bonusPerc)
 			nodeBonus := (float64(minimumVal) * bonusPerc) / 100
 
 			if strings.Contains(cappingScope, "binary") {
@@ -416,21 +417,22 @@ func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPe
 func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, map[int]float64) {
 	totalProfit := make(map[int]float64)
 	var cycleProfits float64
-	var iterant int
+	// var iterant int
 	for i, list := range all_Data {
-		if iterant >= len(totalJoiningCycle) {
-			iterant = 0
-		}
-		total := totalJoiningCycle[iterant] + list[0].SponsorBonus + list[0].BinaryBonus + list[0].MatchingBonus
+		// if iterant >= len(totalJoiningCycle) {
+		// 	iterant = 0
+		// }
+		// total := totalJoiningCycle[iterant] + list[0].SponsorBonus + list[0].BinaryBonus + list[0].MatchingBonus
 
-		iterant = iterant + 1
-		var expense float64
+		// iterant = iterant + 1
+		var expense, cycleRevenue float64
 		for _, member := range list {
 			if member.UserID > 1 {
+				cycleRevenue = cycleRevenue + member.Joining_package_fee
 				expense = expense + ExpenseMembers + member.BinaryBonus + member.MatchingBonus + member.SponsorBonus
 			}
 		}
-		profit := total - expense
+		profit := cycleRevenue - expense
 		cycleProfits = cycleProfits + profit
 		totalProfit[i] = profit
 	}
@@ -907,7 +909,7 @@ func main() {
 		}
 		binaryPercentage, ok := data["binary_percentage"].(float64)
 		if !ok {
-			binaryPercentage = 0.0
+			binaryPercentage = -1.0
 		}
 		floatData := make([]float64, 0)
 		percData := make([]float64, 0)
@@ -945,7 +947,10 @@ func main() {
 		}
 		b_volume, ok := data["b_volume"].([]interface{})
 		if !ok {
-			http.Error(w, "Invalid or missing 'b_volume' field", http.StatusBadRequest)
+			// http.Error(w, "Invalid or missing 'b_volume' field", http.StatusBadRequest)
+			for range joining_package_fee {
+				bv = append(bv, 0.0)
+			}
 			return
 		} else {
 			for _, v := range b_volume {
@@ -967,7 +972,7 @@ func main() {
 		}
 		cappingAmount, ok := data["capping_amount"].(float64)
 		if !ok {
-			http.Error(w, "Invalid or missing 'capping_amount' field", http.StatusBadRequest)
+			cappingAmount = math.Pow(10, 100)
 			return
 		}
 		cappingScope, ok := data["capping_scope"].(string)
@@ -993,7 +998,7 @@ func main() {
 
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
 		result := buildTree(root, int(numMembers), 2)
-
+		fmt.Println(">>>>>>>>>>>>>>>>", bv)
 		stored_id, cycleCount, all_data, totalJoiningCycle := AllocateMembers(int(numMembers), intData, 2, result, floatData, bv)
 		var cycleList [][]*TreeStructure
 		for _, list := range all_data {
@@ -1042,20 +1047,18 @@ func main() {
 		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, cappingAmount, cappingScope, bonusOption)
 		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount, binaryPercentage)
 		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		fmt.Println("Expense Member:", ExpenseMembers)
-		fmt.Println("Total Hoining Cycle:", totalJoiningCycle)
+		// fmt.Println("Expense Member:", ExpenseMembers)
+		// fmt.Println("Total Joining Cycle:", totalJoiningCycle)
 		totalProfitToCompany, totalProfit := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
 		totalPoolBonus, totalPOOLBonus := CalculatePoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus + totalPoolBonus
-
+		sum := 0.0
+		for _, cycle := range totalProfit {
+			sum = sum + cycle
+		}
+		totalProfitToCompany = sum
 		fmt.Println("Total Profit:", totalProfitToCompany)
 		fmt.Println("Cycle Profit:", totalProfit)
-
-		// var treeNodes [][]TreeStructureJSON
-		// for _, list := range cycleList {
-		// 	temp := convertToJSONStructure(list)
-		// 	treeNodes = append(treeNodes, temp)
-		// }
 
 		results := map[string]interface{}{
 			"totalProfitToCompany": totalProfitToCompany,

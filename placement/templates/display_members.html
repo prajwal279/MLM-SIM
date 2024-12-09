@@ -92,12 +92,11 @@
             var totalPoolBonus = {{ results.totalPoolBonus }};
             var totalProfitToCompany = {{ results.totalProfitToCompany }};
             var TotalExpense = {{ results.TotalExpense }};
-            
             // First Pie Chart: Company Financials
             const data1 = google.visualization.arrayToDataTable([
                 ['Category', 'Amount'],
                 ['Profit', totalProfitToCompany],
-                ['Expense', TotalExpense]
+                ['Expense', TotalExpense],
             ]);
     
             const options1 = {
@@ -116,8 +115,8 @@
                     duration: 1000,
                     easing: 'inAndOut'
                 },
-                tooltip: {trigger: 'selection'}, // Display more info on hover
-                sliceVisibilityThreshold: 0.05 // Only show slices with more than 5% share
+                tooltip: {trigger: 'selection'}, 
+                sliceVisibilityThreshold: 0.01
             };
     
             const chart1 = new google.visualization.PieChart(document.getElementById('myChart'));
@@ -148,8 +147,8 @@
                 slices: {
                     0: {offset: 0.1, color: 'lightgreen'},
                     1: {offset: 0.05, color: 'turquoise'},
-                    2: {color: 'violet'},
-                    3: {color: 'hotpink'}
+                    2: {offset: 0.1, color: 'violet'},
+                    3: {offset: 0.05, color: 'hotpink'}
                 },
                 fontName: 'Arial',
                 fontSize: 14,
@@ -160,7 +159,7 @@
                     easing: 'inAndOut'
                 },
                 tooltip: {trigger: 'selection'},
-                sliceVisibilityThreshold: 0.05 
+                sliceVisibilityThreshold: 0.01
             };
     
             const chart2 = new google.visualization.PieChart(document.getElementById('mySecondChart'));

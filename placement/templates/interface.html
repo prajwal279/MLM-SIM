@@ -26,9 +26,11 @@
             box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
         }
         h2 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
+            background: linear-gradient(90deg, #61dfff, #53ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            margin-bottom: 30px;
         }
         .plan-card {
             padding: 20px;
@@ -53,12 +55,12 @@
             display: none;
         }
         .btn-primary {
-            background-color: #5a67d8;
-            border-color: #5a67d8;
+            background-color: #9dbd94;
+            border-color: #3cf13c;
             transition: background-color 0.2s;
         }
         .btn-primary.active {
-            background-color: darkgreen; 
+            background-color: rgb(24, 80, 24); 
             border-color: darkgreen;
         }
         .btn-primary:hover {
@@ -73,6 +75,32 @@
             background-color: #48bb78;
             border-color: #48bb78;
         }
+
+
+
+        .btn-binary {
+            background-color: #ddf3fa;
+            border-color: #ddf3fa;
+            transition: background-color 0.2s;
+        }
+        .btn-binary.active {
+            background-color: rgb(0, 238, 255); 
+            border-color: rgb(0, 238, 255); 
+        }
+        .btn-binary:hover {
+            background-color: rgb(67, 203, 207);
+            border-color: #29a5ca;
+        }
+        .btn-binary-but:hover {
+            background-color: rgb(85, 169, 202);
+            border-color: #8285c5;
+        }
+        .btn-success {
+            background-color: #012e3b;
+            border-color: #4883bb;
+        }
+
+
         .delete-btn {
             background-color: #f44336; 
             color: white;
@@ -92,6 +120,27 @@
         .delete-btn:focus {
             outline: none;
         }
+
+        .level-btn {
+            background-color: #027a08; 
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .level-btn:hover {
+            background-color: #04b943; 
+        }
+
+        .level-btn:focus {
+            outline: none;
+        }
+
         .submit-btn {
             background: linear-gradient(135deg, #ff6f61, #d84b3c);
             color: white; 
@@ -116,14 +165,59 @@
           .btn-group {
             gap: 5px; 
         }
-        
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group .form-control {
+            border-right: none; 
+        }
+
+        .input-group .input-group-text {
+            background-color: #f0f0f0;
+            border-left: none; 
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .styled-input {
+            padding: 10px;
+            border:var(--bs-border-width) solid var(--bs-border-color);
+            font-size: 16px;        
+            outline: none;            
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .styled-input {
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            border-radius: .375rem;
+            background-color: var(--bs-form-control-bg);
+            background-clip: padding-box;
+            border: var(--bs-border-width) solid var(--bs-border-color);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 12px;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        }
+        hr{
+            border: none;
+            height: 12px;
+            background: rgb(1, 125, 163);
+            margin: 20px 0;
+        }
+
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>MLM Plan Calculator</h2>
-     
+    <hr class="hr"/>
     <div class="col-md-6 d-flex align-items-end">
         <div class="btn-group w-100" role="group">
             <button type="button" class="btn btn-primary rounded active" id="binaryBtn">BINARY MLM</button>
@@ -134,10 +228,10 @@
 
     <form id="mlmCalculator" method="post" >
         {% csrf_token %}
-        <div class="row g-3">
+        <div class="container row g-3 mt-3 mb-3">
             <div class="col-md-6">
-                <label for="baseCurrency" class="form-label">Base Currency</label>
-                <select id="baseCurrency" class="form-select">
+                <label for="baseCurrency" class="form-label">Base Currency </label>
+                <select id="baseCurrency" class="form-select" onchange="updateCurrencyLabel()">
                     <option value="USD">USD</option>
                     <option value="EURO">EURO</option>
                     <option value="INR">INR</option>
@@ -156,78 +250,97 @@
             </div>
             <div class="col-md-6">
                 <label for="cycle" class="form-label">Expense per user</label>
-                <input type="number" class="form-control"  name="expense_per_user" placeholder="Enter expense per user">
+                <input type="number" class="form-control"  name="expense_per_user" placeholder="Enter expense per user">                
             </div>
         </div>
-
-        <div id="productContainer">
-            <div class="plan-card mt-4 p-4 product-entry">
+        <div id="productContainer" class="container">
+            <div class="plan-card mt-4 p-4 product-entry border rounded shadow-sm">
                 <div class="row mb-3">
+                    <label for="productName" class="form-label small text-muted">Product Name</label>
                     <div class="col-12">
-                        <input type="text" class="form-control form-control-lg productName" id="productName" name="product_name" placeholder="Product Name">
+                        <input type="text" class="form-control" id="productName" name="product_name" placeholder="Product Name">
                     </div>
                 </div>
+        
                 <div class="row g-3">
-                    <div class="col-md-3">
-                        <input type="text" class="form-control productPrice" id="productPrice" name="joining_package_fee" placeholder="Price">
+                    <div class="col-md-4">
                         <label for="productPrice" class="form-label small text-muted">Price</label>
+                        <div class="input-group">
+                            <input type="text" id="productPrice" name="joining_package_fee" placeholder="Price" class="form-control">
+                            <span class="input-group-text currency">USD</span>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <input type="number" class="form-control" id="productBV" name="b_v" placeholder="BV">
+        
+                    <div class="col-md-4">
                         <label for="productBV" class="form-label small text-muted">Business Volume</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="productBV" name="b_v" placeholder="BV" value="0">
+                            <span class="input-group-text currency">USD</span>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control productQuantity" name="product_quantity" id="productQuantity" placeholder="Quantity">
+                    <div class="col-md-4">
                         <label for="productQuantity" class="form-label small text-muted">Quantity</label>
+                        <input type="text" class="form-control" id="productQuantity" name="product_quantity" placeholder="Quantity">
                     </div>
                 </div>
             </div>
-        </div>
-        <button class="btn btn-primary mt-3" onclick="add()">+ Add Product</button>
+        </div>        
+        <button class="level-btn" onclick="add()">+ Add Product</button>
 
         
-        <div id="binaryForm" class="plan-card hidden mt-4">
-            <h5>Binary Pairing Bonus Calculation</h5>
+        <div id="binaryForm" class="plan-card hidden m-4" class="container">
+            <h5 style="color: #0051ff;">Binary Pairing Bonus Calculation</h5>
             <div class="row g-3">
                 <div class="col-md-6 d-flex align-items-end">
                     <div class="btn-group w-100" role="group">
-                        <button type="button" class="btn btn-primary active rounded" id="weekleg" value="weekleg_value">WEEK LEG</button>
-                        <button type="button" class="btn btn-primary rounded" id="pairing" value="pairing_value">PAIRING</button>
+                        <button type="button" class="btn btn-binary rounded" id="weekleg" value="weekleg_value">WEEK LEG</button>
+                        <button type="button" class="btn btn-binary rounded" id="pairing" value="pairing_value">PAIRING</button>
                     </div>
                 </div>
                 <div id="weeklegForm" class="plan-card hidden mt-4 w-100">   
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label for="binaryPercentage" class="form-label">Binary Percentage</label>
-                            <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="binaryOption" class="form-label">Bonus Option</label>
-                            {{ form.bonus_option }}
-                        </div>
-                        <div class="col-md-4">
-                            <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                            <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
-                        </div>
-                        <div id="matchingLevel">
-                            <div class="col-md-4">
-                                <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                                <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                            <label for="binaryPercentage" class="form-label small text-muted">Binary Percentage</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
+                                <span class="input-group-text">%</span>
                             </div>
                         </div>
-                        <button class="btn btn-primary mt-3 w-25" onclick="addMatching()">+Add Level</button>
-                    </div> 
+                        <div class="col-md-4">
+                            <label for="binaryOption" class="form-label small text-muted">Bonus Option</label>
+                            <div class="input-group">
+                                {{ form.bonus_option }}
+                                <span class="input-group-text currency">USD</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="matchingLevel">
+                            <div class="mb-3">
+                                <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <button class="level-btn" onclick="addMatching()">+Add Level</button>
+                            </div>
+                        </div> 
+                    </div>  
                 </div>    
 
                 <div id="pairingForm" class="plan-card hidden mt-4 w-100">   
                     <div class="row g-3">
-                        <!-- <div class="col-md-4">
-                            <label for="binaryPercentage" class="form-label">Binary Percentage</label>
-                            <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
-                        </div> -->
                         <div class="col-md-4">
-                            <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                            <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                            <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                                <span class="input-group-text">%</span>
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <label for="binaryRatio" class="form-label">Ratio</label>
@@ -235,20 +348,29 @@
                         </div>
                         <div class="col-md-4">
                             <label for="binaryRatio" class="form-label">Ratio Amount</label>
-                            <input type="text" class="form-control" name="{{ form.ratio_amount.name }}" id="id_ratio_amount" placeholder="Ratio Amount">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="{{ form.ratio_amount.name }}" id="id_ratio_amount" placeholder="Ratio Amount">
+                                <span class="input-group-text">USD</span>
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <label for="binaryOption" class="form-label">Bonus Option</label>
-                            {{ form.bonus_option }}
-                        </div>
-                        
-                        <div id="matchingLevel3">
-                            <div class="col-md-4">
-                                <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                                <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                            <div class="input-group">
+                                {{ form.bonus_option }}
+                                <span class="input-group-text currency">USD</span>
                             </div>
                         </div>
-                        <button class="btn btn-primary mt-3 w-25" onclick="addMatchingPairing()">+Add Level</button>
+                        
+                        <div class="col-md-4" id="matchingLevel3">
+                            <div class="mb-3">
+                                <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <button class="level-btn" onclick="addMatchingPairing()">+Add Level</button>
+                            </div>
+                        </div> 
                     </div>   
                 </div>
 
@@ -256,70 +378,87 @@
         </div>
 
         <div id="unilevelForm" class="plan-card hidden mt-4">
-            <h5>Unilevel Bonus Calculation</h5>
+            <h5 style="color: #0051ff;">Unilevel Bonus Calculation</h5>
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="numChild" class="form-label">No of child</label>
                     <input type="number" class="form-control" id="numChild" name="num_child" placeholder="No of child">
                 </div> 
-                <div class="col-md-6">
-                    <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
-                </div>
-                
-                <div id="matchingUnilevel">
-                    <div class="col-md-6">
-                        <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                        <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                <div class="col-md-4">
+                    <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                        <span class="input-group-text">%</span>
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3 w-25" onclick="addUnilevelMatching()">+Add Level</button>
+                <div class="col-md-4" id="matchingUnilevel">
+                    <div class="mb-3">
+                        <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <button class="level-btn" onclick="addUnilevelMatching()">+Add Level</button>
+                    </div>
+                </div> 
             </div> 
         </div>
 
         <div id="matrixForm" class="plan-card hidden mt-4">
-            <h5>Matrix Bonus Calculation</h5>
+            <h5 style="color: #0051ff;">Matrix Bonus Calculation</h5>
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="numChild" class="form-label">No of child</label>
                     <input type="number" class="form-control" id="numChild" name="num_child" placeholder="No of child">
                 </div>          
-                <div class="col-md-6">
-                    <label for="sponsorBonus" class="form-label">Sponsor Bonus (%)</label>
-                    <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
-                </div>
-                <div id="matchingLevel2">
-                    <div class="col-md-6">
-                        <label for="matchingBonus" class="form-label">Matching Bonus (%)</label>
-                        <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                <div class="col-md-4">
+                    <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                        <span class="input-group-text">%</span>
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3 w-25" onclick="addMatrix()">+Add Level</button>
+                <div class="col-md-4" id="matchingLevel2">
+                    <div class="mb-3">
+                        <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="matching_bonus_percent" id="matchingBonus" placeholder="Matching Bonus %">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <button class="level-btn" onclick="addMatrix()">+Add Level</button>
+                    </div>
+                </div> 
             </div>
         </div>
         
-        <div id="productContainer" >
+        <div id="productContainer" class="container" >
             {% csrf_token %}
             <div class="row g-3">
-                <h5>Pool Pairing Bonus Calculation</h5>
+                <h5 style="color: #0051ff;">Pool Pairing Bonus Calculation</h5>
                 <div class="col-md-6">
                     <label  class="form-label">Pool member count</label>
                     <input type="number" class="form-control" name="dist_member" placeholder="Enter Pool member Count">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Pool Bonus Percentage</label>
-                    <input type="number" class="form-control"  name="pool_percentage" placeholder="Enter Pool Bonus Percentage">
+                    <div class="input-group">
+                        <input type="number" class="form-control"  name="pool_percentage" placeholder="Enter Pool Bonus Percentage">
+                        <span class="input-group-text">%</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="plan-card mt-4 p-4">
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label for="cappingLimit" class="form-label">Capping Limit (Amount)</label>
-                    <input type="number" class="form-control" name="capping_limit" id="cappingLimit" placeholder="Enter amount">
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="capping_limit" id="cappingLimit" placeholder="Enter amount">
+                        <span class="input-group-text currency">USD</span>
+                    </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4 ml-4">
                     <label class="form-label" name="capping_scope" > Capping Scope </label>
                     {{ form.capping_scope }}
                 </div>
@@ -329,6 +468,13 @@
 </div>
 
 <script>
+    function updateCurrencyLabel(){
+        const curr = document.getElementById("baseCurrency").value;
+        const currencyElements = document.querySelectorAll(".currency");
+        currencyElements.forEach(item => {
+            item.innerHTML = curr;
+        })
+    }
     function add() {
         event.preventDefault();
         const productContainer = document.getElementById('productContainer');
@@ -518,6 +664,9 @@
             ratioAmountInput.value = 1.0;
         }
     });
+    window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('weekleg').click();
+    });
 
     document.getElementById('pairing').addEventListener('click', function() {
         document.getElementById('pairingForm').classList.remove('hidden');
@@ -555,17 +704,14 @@
         const unilevelPercentage = document.getElementById('unilevelPercentage') ? document.getElementById('unilevelPercentage').value : null;
         const unilevelSponsorBonus = document.getElementById('unilevelSponsorBonus') ? document.getElementById('unilevelSponsorBonus').value : null;
 
-        // Matrix form values
         const matrixPercentage = document.getElementById('matrixPercentage') ? document.getElementById('matrixPercentage').value : null;
         const matrixSponsorBonus = document.getElementById('matrixSponsorBonus') ? document.getElementById('matrixSponsorBonus').value : null;
 
-        // Capping limit values
         const cappingLimit = document.getElementById('cappingLimit').value;
         const binaryBonusChecked = document.getElementById('binaryBonus').checked;
         const sponsorBonusChecked = document.getElementBweeklegId('sponsorBonusScope').checked;
         const matchingBonusChecked = document.getElementById('matchingBonusScope').checked;
 
-        // Create the result message
         let resultMessage = `
             <strong>MLM Plan Details:</strong><br>
             Base Currency: ${baseCurrency}<br>

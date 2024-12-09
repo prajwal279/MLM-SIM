@@ -47,7 +47,8 @@ def build_new_tree(request):
                 "ratio":ratio,
                 "ratio_amount":ratio_amount,
             }
-            print(data)
+            if data['capping_amount'] is None:
+                data['capping_amount'] = 10**100
             try:
                 response = requests.post('http://localhost:9000/calculate', json=data)
                 response.raise_for_status() 
@@ -104,6 +105,8 @@ def build_unilevel_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
+            if data['capping_amount'] is None:
+                data['capping_amount'] = 10**100
             try:
                 response = requests.post('http://localhost:9000/unilevel', json=data)
                 response.raise_for_status() 
