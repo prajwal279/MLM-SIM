@@ -13,10 +13,10 @@ def build_new_tree(request):
             num_members = form.cleaned_data['num_members']
             dist_member = form.cleaned_data['dist_member']
             pool_percentage = form.cleaned_data['pool_percentage']
-            # expense_per_user = form.cleaned_data['expense_per_user'] 
             expense_per_user = float(request.POST.get('expense_per_user') or 0)
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[0]) if request.POST.getlist('sponsor_bonus_percent')[0]!="" else float(request.POST.getlist('sponsor_bonus_percent')[1])
+            sponsor_bonus_type = request.POST.get('sponsor_bonus_type', 'percent')
             binary_bonus_percent = form.cleaned_data['binary_bonus_percent']
             joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
             b_volume = [int(level.strip()) for level in request.POST.getlist('b_v', '') if level.strip().isdigit()]
@@ -35,6 +35,7 @@ def build_new_tree(request):
                 "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
                 "sponsor_percentage": sponsor_bonus_percent,
+                "sponsor_bonus_type": sponsor_bonus_type,
                 "binary_percentage": binary_bonus_percent,
                 "joining_package_fee": joining_package_fee,
                 "b_volume" : b_volume,
@@ -49,6 +50,7 @@ def build_new_tree(request):
             }
             if data['capping_amount'] is None:
                 data['capping_amount'] = 10**100
+            print(sponsor_bonus_type)
             try:
                 response = requests.post('http://localhost:9000/calculate', json=data)
                 response.raise_for_status() 
@@ -82,6 +84,7 @@ def build_unilevel_tree(request):
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = float(request.POST.getlist('sponsor_bonus_percent')[2])
+            sponsor_bonus_type = request.POST.get('sponsor_bonus_type', 'percent')
             joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
             bonus_option = form.cleaned_data['bonus_option']
             capping_limit = form.cleaned_data['capping_limit']
@@ -97,6 +100,7 @@ def build_unilevel_tree(request):
                 "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
                 "sponsor_percentage": sponsor_bonus_percent,
+                "sponsor_bonus_type": sponsor_bonus_type,
                 "joining_package_fee": joining_package_fee,
                 "bonus_option": bonus_option,
                 "product_quantity": product_quantity,
@@ -107,6 +111,7 @@ def build_unilevel_tree(request):
             }
             if data['capping_amount'] is None:
                 data['capping_amount'] = 10**100
+            print(sponsor_bonus_type)
             try:
                 response = requests.post('http://localhost:9000/unilevel', json=data)
                 response.raise_for_status() 
@@ -137,6 +142,7 @@ def build_matrix_tree(request):
             expense_per_user = form.cleaned_data['expense_per_user']
             product_name = [level.strip() for level in request.POST.getlist('product_name', '') if level.strip()]
             sponsor_bonus_percent = form.cleaned_data['sponsor_bonus_percent']
+            sponsor_bonus_type = request.POST.get('sponsor_bonus_type', 'percent')
             joining_package_fee = [int(level.strip()) for level in request.POST.getlist('joining_package_fee', '') if level.strip().isdigit()]
             bonus_option = form.cleaned_data['bonus_option']
             capping_limit = form.cleaned_data['capping_limit']
@@ -152,6 +158,7 @@ def build_matrix_tree(request):
                 "expense_per_user": expense_per_user,
                 "product_name": product_name,                                            
                 "sponsor_percentage": sponsor_bonus_percent,
+                "sponsor_bonus_type": sponsor_bonus_type,
                 "joining_package_fee": joining_package_fee,
                 "bonus_option": bonus_option,
                 "product_quantity": product_quantity,
@@ -160,6 +167,7 @@ def build_matrix_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
+            print(sponsor_bonus_type)
             try:
                 response = requests.post('http://localhost:9000/matrix', json=data)
                 response.raise_for_status() 

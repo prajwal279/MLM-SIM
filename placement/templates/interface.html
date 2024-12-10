@@ -180,7 +180,13 @@
             font-weight: bold;
             color: #495057;
         }
-
+        .input-group .form-select {
+            background-color: #f0f0f0;
+            border-left: none; 
+            font-weight: bold;
+            color: #495057;
+            border-radius: 0; 
+        }
         .styled-input {
             padding: 10px;
             border:var(--bs-border-width) solid var(--bs-border-color);
@@ -316,10 +322,21 @@
                         <div class="col-md-4">
                             <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
-                                <span class="input-group-text">%</span>
+                                <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
+                                <select class="input" id="sponsorBonusType" name="sponsor_bonus_type">
+                                    <option value="percent" selected>%</option>
+                                    <option value="usd">USD</option>
+                                </select>
                             </div>
                         </div>
+                        <!-- <div class="col-md-4">
+                            <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                                <span class="input-group-text">%</span>
+                                <span class="input-group-text">USD</span>
+                            </div>
+                        </div> -->
                         <div class="col-md-4" id="matchingLevel">
                             <div class="mb-3">
                                 <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
@@ -338,10 +355,20 @@
                         <div class="col-md-4">
                             <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                             <div class="input-group">
+                                <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
+                                <select class="input-form-select" id="sponsorBonus" name="sponsor_bonus_type">
+                                    <option value="percent" selected>%</option>
+                                    <option value="usd">USD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-4">
+                            <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                            <div class="input-group">
                                 <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                                 <span class="input-group-text">%</span>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                             <label for="binaryRatio" class="form-label">Ratio</label>
                             {{ form.ratio }}
@@ -384,13 +411,17 @@
                     <label for="numChild" class="form-label">No of child</label>
                     <input type="number" class="form-control" id="numChild" name="num_child" placeholder="No of child">
                 </div> 
+                
                 <div class="col-md-4">
                     <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
-                        <span class="input-group-text">%</span>
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
+                        <select class="input-group-text" id="sponsorBonus" name="sponsor_bonus_type">
+                            <option value="percent" selected>%</option>
+                            <option value="usd">USD</option>
+                        </select>
                     </div>
-                </div>
+                </div> 
                 <div class="col-md-4" id="matchingUnilevel">
                     <div class="mb-3">
                         <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
@@ -410,14 +441,24 @@
                 <div class="col-md-6">
                     <label for="numChild" class="form-label">No of child</label>
                     <input type="number" class="form-control" id="numChild" name="num_child" placeholder="No of child">
-                </div>          
+                </div>     
                 <div class="col-md-4">
+                    <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
+                        <select class="input-group-text" id="sponsorBonus" name="sponsor_bonus_type">
+                            <option value="percent" selected>%</option>
+                            <option value="usd">USD</option>
+                        </select>
+                    </div>
+                </div>      
+                <!-- <div class="col-md-4">
                     <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                     <div class="input-group">
                         <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
                         <span class="input-group-text">%</span>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-md-4" id="matchingLevel2">
                     <div class="mb-3">
                         <label for="matchingBonus" class="form-label small text-muted">Matching Bonus</label>
