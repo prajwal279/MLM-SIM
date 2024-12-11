@@ -111,7 +111,6 @@ def build_unilevel_tree(request):
             }
             if data['capping_amount'] is None:
                 data['capping_amount'] = 10**100
-            print(sponsor_bonus_type)
             try:
                 response = requests.post('http://localhost:9000/unilevel', json=data)
                 response.raise_for_status() 
@@ -167,7 +166,8 @@ def build_matrix_tree(request):
                 "matching_percentage": matching_bonus_percents,
                 "cycle": cycle,
             }
-            print(sponsor_bonus_type)
+            if data['capping_amount'] is None:
+                data['capping_amount'] = 10**100
             try:
                 response = requests.post('http://localhost:9000/matrix', json=data)
                 response.raise_for_status() 

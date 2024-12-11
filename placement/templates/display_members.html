@@ -92,11 +92,13 @@
             var totalPoolBonus = {{ results.totalPoolBonus }};
             var totalProfitToCompany = {{ results.totalProfitToCompany }};
             var TotalExpense = {{ results.TotalExpense }};
+            var Revenue = {{results.Revenue}};
             // First Pie Chart: Company Financials
             const data1 = google.visualization.arrayToDataTable([
                 ['Category', 'Amount'],
                 ['Profit', totalProfitToCompany],
                 ['Expense', TotalExpense],
+                //['Revenue', Revenue],
             ]);
     
             const options1 = {
@@ -105,7 +107,8 @@
                 pieSliceText: 'percentage', 
                 slices: {
                     0: {offset: 0.1, color: '#66bb6a'},
-                    1: {offset: 0.05, color: '#f44336'} 
+                    1: {offset: 0.05, color: '#f44336'},
+                   // 2: {offset: 0.03, color: '#4c51bf'} 
                 },
                 fontName: 'Arial',
                 fontSize: 14,
@@ -226,6 +229,8 @@
                                 const value = tooltipItem.raw || 0;
                                 return `${label}: ${value.toLocaleString()}`;
                             }
+                            mode: 'index',
+                            intersect: false,
                         }
                     },
                     legend: {

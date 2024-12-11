@@ -360,11 +360,11 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 
 			var bonusPerc float64
 			switch {
-			case noOfPairs > 0 && noOfPairs <= 5 && binaryPercentage != 0:
+			case noOfPairs > 0 && noOfPairs <= 5 && binaryPercentage == -1:
 				bonusPerc = b1
-			case noOfPairs > 5 && noOfPairs <= 10 && binaryPercentage != 0:
+			case noOfPairs > 5 && noOfPairs <= 10 && binaryPercentage == -1:
 				bonusPerc = b2
-			case noOfPairs > 10 && binaryPercentage != 0:
+			case noOfPairs > 10 && binaryPercentage == -1:
 				bonusPerc = b3
 			default:
 				bonusPerc = binaryPercentage
@@ -384,7 +384,6 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 			}
 		}
 	}
-	fmt.Println(totalBonus)
 	return TBB, totalBonus
 }
 
@@ -428,9 +427,9 @@ func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPe
 	ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
 
-func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, map[int]float64) {
+func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, float64, map[int]float64) {
 	totalProfit := make(map[int]float64)
-	var cycleProfits float64
+	var cycleProfits,Revenue float64
 	for i, list := range all_Data {
 		var expense, cycleRevenue float64
 		for _, member := range list {
@@ -441,9 +440,11 @@ func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, to
 		}
 		profit := cycleRevenue - expense
 		cycleProfits = cycleProfits + profit
+		Revenue = Revenue + cycleRevenue
 		totalProfit[i] = profit
 	}
-	return cycleProfits, totalProfit
+	fmt.Println(">>>",Revenue)
+	return cycleProfits, Revenue, totalProfit
 }
 
 func CalculatePoolBonus(all_Data [][]*TreeStructure, totalProfit map[int]float64, pool_perc float64, dist_no int) (float64, map[int]float64) {
@@ -591,7 +592,6 @@ func CalculateUnilevelSponsorBonus(allData [][]*TreeStructure, sponsorBonusPerce
 			}
 		}
 	}
-	fmt.Println(",,,", totalBonus)
 	return TSB, totalBonus
 }
 
@@ -610,7 +610,6 @@ func CalculateUnilevelMatchingBonus(allData [][]*TreeStructure, matchingPercenta
 		}
 	}
 	for i, list := range allData {
-		fmt.Println("sfuhjfhsuhfu")
 		for _, member := range list {
 			if strings.Contains(cappingScope, "matching") && member.MatchingBonus > cappingAmount {
 				member.MatchingBonus = cappingAmount
@@ -620,10 +619,8 @@ func CalculateUnilevelMatchingBonus(allData [][]*TreeStructure, matchingPercenta
 				TMB += member.MatchingBonus
 				totalBonus[i] += member.MatchingBonus
 			}
-			fmt.Println(member.UserID, member.MatchingBonus, member.SponsorBonus)
 		}
 	}
-	fmt.Println(totalBonus)
 	return TMB, totalBonus
 }
 
@@ -632,7 +629,6 @@ func ApplyUnilevelMatchingBonus(member *TreeStructure, parent *TreeStructure, ma
 		return
 	}
 	matching_bonus := parent.MatchingBonus + (member.SponsorBonus * matchingPercentages[iterant] / 100)
-	fmt.Println("safjfij", parent.UserID, member.UserID, member.SponsorBonus*matchingPercentages[iterant]/100)
 	parent.MatchingBonus = matching_bonus
 	iterant = iterant + 1
 	parent = parent.ParentID
@@ -663,7 +659,6 @@ func FindUnilevelProfitToCompany(all_Data [][]*TreeStructure, ExpenseMembers flo
 
 		pool_amount = pool_amount + PoolAmount[i]
 	}
-	fmt.Println("C", pool_amount, PoolAmount)
 	return cycleProfits, totalProfit, pool_amount, PoolAmount
 }
 
@@ -877,10 +872,8 @@ func FindMatrixProfitToCompany(all_Data [][]*TreeStructure, ExpenseMembers float
 
 		pool_amount = pool_amount + PoolAmount[i]
 	}
-	fmt.Println("C", pool_amount, PoolAmount)
 	return cycleProfits, totalProfit, pool_amount, PoolAmount
 }
-
 
 func sendResultsToDjango(results interface{}) {
 	jsonData, err := json.Marshal(results)
@@ -1075,7 +1068,7 @@ func main() {
 		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type, cappingAmount, cappingScope, bonusOption)
 		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount, binaryPercentage)
 		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		totalProfitToCompany, totalProfit := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
+		totalProfitToCompany, Revenue, totalProfit := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
 		totalPoolBonus, totalPOOLBonus := CalculatePoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus + totalPoolBonus
 		sum := 0.0
@@ -1088,6 +1081,7 @@ func main() {
 			"totalProfitToCompany": totalProfitToCompany,
 			"totalProfit":          totalProfit,
 			"TotalExpense":         TotalExpense,
+			"Revenue":				Revenue,
 			// "treeNodes":            treeNodes,
 			"stored_id":            stored_id,
 			"cycleCount":           cycleCount,
@@ -1376,7 +1370,6 @@ func main() {
 			http.Error(w, "Invalid or missing 'sponsor_bonus_type' field", http.StatusBadRequest)
 			return
 		}
-		fmt.Println("sponsor_bonus_type", sponsor_bonus_type)
 		cappingAmount, ok := data["capping_amount"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'capping_amount' field", http.StatusBadRequest)
