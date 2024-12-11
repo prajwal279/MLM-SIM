@@ -316,9 +316,9 @@ func Traverse(node *TreeStructure, limit int, bonus_option string) float64 {
 func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio string, ratioAmount int, cappingScope string, cappingAmount float64, cycleCount int, binaryPercentage float64) (float64, map[int]float64) {
 	var TBB float64
 	totalBonus := make(map[int]float64)
-	b1 := 10.0
-	b2 := 15.0
-	b3 := 20.0
+	b1 := 5.0
+	b2 := 10.0
+	b3 := 15.0
 	for i, nodeList := range allData {
 		for _, node := range nodeList {
 			if i != 0 && node.UserID < len(allData[i-1]) {
@@ -384,6 +384,7 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 			}
 		}
 	}
+	fmt.Println(totalBonus)
 	return TBB, totalBonus
 }
 
@@ -583,12 +584,17 @@ func CalculateUnilevelSponsorBonus(allData [][]*TreeStructure, sponsorBonusPerce
 
 	for i, list := range allData {
 		for _, member := range list {
-			TSB += member.SponsorBonus
-			totalBonus[i] += member.SponsorBonus
+
+			if member.UserID != 1 {
+				TSB += member.SponsorBonus
+				totalBonus[i] += member.SponsorBonus
+			}
 		}
 	}
+	fmt.Println(",,,", totalBonus)
 	return TSB, totalBonus
 }
+
 func CalculateUnilevelMatchingBonus(allData [][]*TreeStructure, matchingPercentages []float64, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
 	var TMB float64
 	totalBonus := make(map[int]float64)
@@ -604,14 +610,20 @@ func CalculateUnilevelMatchingBonus(allData [][]*TreeStructure, matchingPercenta
 		}
 	}
 	for i, list := range allData {
+		fmt.Println("sfuhjfhsuhfu")
 		for _, member := range list {
 			if strings.Contains(cappingScope, "matching") && member.MatchingBonus > cappingAmount {
 				member.MatchingBonus = cappingAmount
 			}
-			TMB += member.MatchingBonus
-			totalBonus[i] += member.MatchingBonus
+
+			if member.UserID != 1 {
+				TMB += member.MatchingBonus
+				totalBonus[i] += member.MatchingBonus
+			}
+			fmt.Println(member.UserID, member.MatchingBonus, member.SponsorBonus)
 		}
 	}
+	fmt.Println(totalBonus)
 	return TMB, totalBonus
 }
 
@@ -620,48 +632,52 @@ func ApplyUnilevelMatchingBonus(member *TreeStructure, parent *TreeStructure, ma
 		return
 	}
 	matching_bonus := parent.MatchingBonus + (member.SponsorBonus * matchingPercentages[iterant] / 100)
-
+	fmt.Println("safjfij", parent.UserID, member.UserID, member.SponsorBonus*matchingPercentages[iterant]/100)
 	parent.MatchingBonus = matching_bonus
 	iterant = iterant + 1
 	parent = parent.ParentID
 	ApplyUnilevelMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
 
-func FindUnilevelProfitToCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, map[int]float64) {
+func FindUnilevelProfitToCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64, pool_perc float64) (float64, map[int]float64, float64, map[int]float64) {
 	totalProfit := make(map[int]float64)
 	var cycleProfits float64
-	var iterant int
-	for i, list := range all_Data {
-		if iterant >= len(totalJoiningCycle) {
-			iterant = 0
-		}
-		total := totalJoiningCycle[iterant] + list[0].SponsorBonus + list[0].MatchingBonus
-
-		iterant = iterant + 1
-		var expense float64
-		for _, member := range list {
-			if member.UserID > 1 {
-				expense = expense + ExpenseMembers + member.MatchingBonus + member.SponsorBonus
-			}
-		}
-		profit := total - expense
-		cycleProfits = cycleProfits + profit
-		totalProfit[i] = profit
-	}
-	return cycleProfits, totalProfit
-}
-
-func CalculateUnilevelPoolBonus(all_Data [][]*TreeStructure, totalProfit map[int]float64, pool_perc float64, dist_no int) (float64, map[int]float64) {
 	var pool_amount float64
 	PoolAmount := make(map[int]float64)
+	for i, list := range all_Data {
+		var expense, cycleRevenue float64
+		for _, member := range list {
+			if member.UserID != 1 {
+				cycleRevenue = cycleRevenue + member.Joining_package_fee
+				expense = expense + ExpenseMembers + member.BinaryBonus + member.MatchingBonus + member.SponsorBonus + member.PoolBonus
+			}
+		}
+		profit := cycleRevenue - expense
+		expense = expense + (profit * (pool_perc / 100))
 
-	for i := range totalProfit {
-		PoolAmount[i] = totalProfit[i] * pool_perc / 100
-		totalProfit[i] = totalProfit[i] - PoolAmount[i]
+		PoolAmount[i] = profit * pool_perc / 100
+
+		profit = cycleRevenue - expense
+		cycleProfits = cycleProfits + profit
+		totalProfit[i] = profit
+
 		pool_amount = pool_amount + PoolAmount[i]
 	}
-	return pool_amount, PoolAmount
+	fmt.Println("C", pool_amount, PoolAmount)
+	return cycleProfits, totalProfit, pool_amount, PoolAmount
 }
+
+// func CalculateUnilevelPoolBonus(all_Data [][]*TreeStructure, totalProfit map[int]float64, pool_perc float64, dist_no int) (float64, map[int]float64) {
+// 	var pool_amount float64
+// 	PoolAmount := make(map[int]float64)
+
+// 	for i := range totalProfit {
+// 		PoolAmount[i] = totalProfit[i] * pool_perc / 100
+// 		totalProfit[i] = totalProfit[i] - PoolAmount[i]
+// 		pool_amount = pool_amount + PoolAmount[i]
+// 	}
+// 	return pool_amount, PoolAmount
+// }
 
 func buildMatrixTree(root *TreeStructure, numMembers int, startID int, numChild int) []*TreeStructure {
 	if numMembers <= 0 {
@@ -788,8 +804,10 @@ func CalculateMatrixSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent
 
 	for i, list := range allData {
 		for _, member := range list {
-			TSB += member.SponsorBonus
-			totalBonus[i] += member.SponsorBonus
+			if member.UserID != 1 {
+				TSB += member.SponsorBonus
+				totalBonus[i] += member.SponsorBonus
+			}
 		}
 	}
 	return TSB, totalBonus
@@ -814,8 +832,10 @@ func CalculateMatrixMatchingBonus(allData [][]*TreeStructure, matchingPercentage
 			if strings.Contains(cappingScope, "matching") && member.MatchingBonus > cappingAmount {
 				member.MatchingBonus = cappingAmount
 			}
-			TMB += member.MatchingBonus
-			totalBonus[i] += member.MatchingBonus
+			if member.UserID != 1 {
+				TMB += member.MatchingBonus
+				totalBonus[i] += member.MatchingBonus
+			}
 		}
 	}
 	return TMB, totalBonus
@@ -833,41 +853,34 @@ func ApplyMatrixMatchingBonus(member *TreeStructure, parent *TreeStructure, matc
 	ApplyMatrixMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
 
-func FindMatrixProfitToCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, map[int]float64) {
+func FindMatrixProfitToCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64, pool_perc float64) (float64, map[int]float64, float64, map[int]float64) {
 	totalProfit := make(map[int]float64)
 	var cycleProfits float64
-	var iterant int
-	for i, list := range all_Data {
-		if iterant >= len(totalJoiningCycle) {
-			iterant = 0
-		}
-		total := totalJoiningCycle[iterant] + list[0].SponsorBonus + list[0].MatchingBonus
-
-		iterant = iterant + 1
-		var expense float64
-		for _, member := range list {
-			if member.UserID > 1 {
-				expense = expense + ExpenseMembers + member.MatchingBonus + member.SponsorBonus
-			}
-		}
-		profit := total - expense
-		cycleProfits = cycleProfits + profit
-		totalProfit[i] = profit
-	}
-	return cycleProfits, totalProfit
-}
-
-func CalculateMatrixPoolBonus(all_Data [][]*TreeStructure, totalProfit map[int]float64, pool_perc float64, dist_no int) (float64, map[int]float64) {
 	var pool_amount float64
 	PoolAmount := make(map[int]float64)
+	for i, list := range all_Data {
+		var expense, cycleRevenue float64
+		for _, member := range list {
+			if member.UserID != 1 {
+				cycleRevenue = cycleRevenue + member.Joining_package_fee
+				expense = expense + ExpenseMembers + member.BinaryBonus + member.MatchingBonus + member.SponsorBonus + member.PoolBonus
+			}
+		}
+		profit := cycleRevenue - expense
+		expense = expense + (profit * (pool_perc / 100))
 
-	for i := range totalProfit {
-		PoolAmount[i] = totalProfit[i] * pool_perc / 100
-		totalProfit[i] = totalProfit[i] - PoolAmount[i]
+		PoolAmount[i] = profit * pool_perc / 100
+
+		profit = cycleRevenue - expense
+		cycleProfits = cycleProfits + profit
+		totalProfit[i] = profit
+
 		pool_amount = pool_amount + PoolAmount[i]
 	}
-	return pool_amount, PoolAmount
+	fmt.Println("C", pool_amount, PoolAmount)
+	return cycleProfits, totalProfit, pool_amount, PoolAmount
 }
+
 
 func sendResultsToDjango(results interface{}) {
 	jsonData, err := json.Marshal(results)
@@ -1186,11 +1199,11 @@ func main() {
 			http.Error(w, "Invalid or missing 'pool_percentage' field", http.StatusBadRequest)
 			return
 		}
-		DistNo, ok := data["dist_member"].(float64)
-		if !ok {
-			http.Error(w, "Invalid or missing 'dist_member' field", http.StatusBadRequest)
-			return
-		}
+		// DistNo, ok := data["dist_member"].(float64)
+		// if !ok {
+		// 	http.Error(w, "Invalid or missing 'dist_member' field", http.StatusBadRequest)
+		// 	return
+		// }
 		root := &TreeStructure{UserID: 1, Levels: 0, Cycle: 1}
 		result := buildUnilevelTree(root, int(numMembers), 2, int(numChild))
 		stored_id, cycleCount, all_data, totalJoiningCycle := AllocateUnilevelMembers(int(numMembers), intData, 2, result, floatData)
@@ -1249,8 +1262,8 @@ func main() {
 
 		totalUnilevelSponsorBonus, totalUnilevelSPONSORBonus := CalculateUnilevelSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type, cappingAmount, cappingScope)
 		totalUnilevelMatchingBonus, totalUnilevelMATCHINGBonus := CalculateUnilevelMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		totalUnilevelProfitToCompany, totalProfit := FindUnilevelProfitToCompany(cycleList, ExpenseMembers, totalJoiningCycle)
-		totalPoolBonus, totalPOOLBonus := CalculateUnilevelPoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
+		totalUnilevelProfitToCompany, totalProfit, totalPoolBonus, totalPOOLBonus := FindUnilevelProfitToCompany(cycleList, ExpenseMembers, totalJoiningCycle, PoolPerc)
+		// totalPoolBonus, totalPOOLBonus := CalculateUnilevelPoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 		TotalUnilevelExpense := totalUnilevelSponsorBonus + totalUnilevelMatchingBonus + totalPoolBonus
 		// var treeNodes [][]TreeStructureJSON
 		// for _, list := range cycleList {
@@ -1334,11 +1347,6 @@ func main() {
 		PoolPerc, ok := data["pool_percentage"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'pool_percentage' field", http.StatusBadRequest)
-			return
-		}
-		DistNo, ok := data["dist_member"].(float64)
-		if !ok {
-			http.Error(w, "Invalid or missing 'dist_member' field", http.StatusBadRequest)
 			return
 		}
 		joining_package_fee, ok := data["joining_package_fee"].([]interface{})
@@ -1436,14 +1444,9 @@ func main() {
 
 		CalculateMatrixSponsorBonus, totalMatrixSPONSORBonus := CalculateMatrixSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type, cappingAmount, cappingScope)
 		CalculateMatrixMatchingBonus, totalMatrixMATCHINGBonus := CalculateMatrixMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		FindMatrixProfitToCompany, totalProfit := FindMatrixProfitToCompany(cycleList, ExpenseMembers, totalJoiningCycle)
-		totalPoolBonus, totalPOOLBonus := CalculateMatrixPoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
+		FindMatrixProfitToCompany, totalProfit, totalPoolBonus, totalPOOLBonus := FindMatrixProfitToCompany(cycleList, ExpenseMembers, totalJoiningCycle, PoolPerc)
+		// totalPoolBonus, totalPOOLBonus := CalculateMatrixPoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 		TotalMatrixExpense := CalculateMatrixSponsorBonus + CalculateMatrixMatchingBonus + totalPoolBonus
-		// var treeNodes [][]TreeStructureJSON
-		// for _, list := range cycleList {
-		// 	temp := convertToJSONStructure(list)
-		// 	treeNodes = append(treeNodes, temp)
-		// }
 
 		results := map[string]interface{}{
 			"totalPoolBonus":     totalPoolBonus,
