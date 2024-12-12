@@ -242,12 +242,14 @@ func AllocateMembers(numMembers int, product_quantity []int, startID int, result
 	return allCycles, cycleCount, all_data, totalJoiningFee
 }
 
-func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, sponsor_bonus_type string, cappingAmount float64, cappingScope, bonusOption string) (float64, map[int]float64) {
+func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, sponsor_bonus_type1 string, sponsor_bonus_type2 string, cappingAmount float64, cappingScope, bonusOption string) (float64, map[int]float64) {
 	var TSB float64
+
 	totalBonus := make(map[int]float64)
 
 	calculateBonus := func(member *TreeStructure, valueSelector func(*TreeStructure) float64) float64 {
 		var rightBonus, leftBonus float64
+		// var selected string
 
 		if member.RightMember != nil {
 			rightBonus = valueSelector(member.RightMember)
@@ -256,14 +258,34 @@ func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float
 			leftBonus = valueSelector(member.LeftMember)
 		}
 
-		if strings.Contains(sponsor_bonus_type, "percent") {
-			if member.RightMember != nil {
-				rightBonus = valueSelector(member.RightMember) * sponsorBonusPercent / 100
-			}
-			if member.LeftMember != nil {
-				leftBonus = valueSelector(member.LeftMember) * sponsorBonusPercent / 100
-			}
-		} else if strings.Contains(sponsor_bonus_type, "usd") {
+		// if strings.Contains(sponsor_bonus_type1, "percent") || strings.Contains(sponsor_bonus_type2, "percent") {
+		// 	// if strings.Contains(sponsor_bonus_type1, "percent") {
+		// 	// 	selected = sponsor_bonus_type1
+		// 	// } else {
+		// 	// 	selected = sponsor_bonus_type2
+		// 	// }
+		// 	if member.RightMember != nil {
+		// 		rightBonus = valueSelector(member.RightMember) * sponsorBonusPercent / 100
+		// 	}
+		// 	if member.LeftMember != nil {
+		// 		leftBonus = valueSelector(member.LeftMember) * sponsorBonusPercent / 100
+		// 	}
+		// } else if strings.Contains(sponsor_bonus_type1, "usd") || strings.Contains(sponsor_bonus_type2, "usd") {
+		// 	// if strings.Contains(sponsor_bonus_type1, "usd") {
+		// 	// 	selected = sponsor_bonus_type1
+		// 	// } else {
+		// 	// 	selected = sponsor_bonus_type2
+		// 	// }
+		// 	if member.RightMember != nil {
+		// 		member.SponsorBonus = sponsorBonusPercent
+		// 		rightBonus = member.SponsorBonus
+		// 	}
+		// 	if member.LeftMember != nil {
+		// 		member.SponsorBonus = sponsorBonusPercent
+		// 		leftBonus = member.SponsorBonus
+		// 	}
+		// }
+		if strings.Contains(sponsor_bonus_type1, "usd") {
 			if member.RightMember != nil {
 				member.SponsorBonus = sponsorBonusPercent
 				rightBonus = member.SponsorBonus
@@ -272,7 +294,15 @@ func CalculateSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float
 				member.SponsorBonus = sponsorBonusPercent
 				leftBonus = member.SponsorBonus
 			}
+		} else {
+			if member.RightMember != nil {
+				rightBonus = valueSelector(member.RightMember) * sponsorBonusPercent / 100
+			}
+			if member.LeftMember != nil {
+				leftBonus = valueSelector(member.LeftMember) * sponsorBonusPercent / 100
+			}
 		}
+		
 		TSB := rightBonus + leftBonus
 		if strings.Contains(cappingScope, "sponsor") && TSB > cappingAmount {
 			TSB = cappingAmount
@@ -313,8 +343,8 @@ func Traverse(node *TreeStructure, limit int, bonus_option string) float64 {
 	return currentSales + leftSales + rightSales
 }
 
-func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio string, ratioAmount int, cappingScope string, cappingAmount float64, cycleCount int, binaryPercentage float64) (float64, map[int]float64) {
-	var TBB float64
+func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio string, ratioAmount int, cappingScope string, cappingAmount float64, cycleCount int, binaryPercentage float64, binary_bonus_type string) (float64, map[int]float64) {
+	var TBB, nodeBonus float64
 	totalBonus := make(map[int]float64)
 	b1 := 5.0
 	b2 := 10.0
@@ -369,8 +399,11 @@ func BinaryWithRatio(allData [][]*TreeStructure, bonusOption string, binaryRatio
 			default:
 				bonusPerc = binaryPercentage
 			}
-			nodeBonus := (float64(minimumVal) * bonusPerc) / 100
-
+			if strings.Contains(binary_bonus_type, "percent") {
+				nodeBonus = (float64(minimumVal) * bonusPerc) / 100
+			} else if strings.Contains(binary_bonus_type, "usd") {
+				bonusPerc = (float64(minimumVal) * bonusPerc)
+			}
 			if strings.Contains(cappingScope, "binary") {
 				if nodeBonus > cappingAmount {
 					node.FlushOut = float64(nodeBonus) - cappingAmount
@@ -427,9 +460,11 @@ func ApplyMatchingBonus(member *TreeStructure, parent *TreeStructure, matchingPe
 	ApplyMatchingBonus(member, parent, matchingPercentages, iterant, cappingAmount, cappingScope)
 }
 
-func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, float64, map[int]float64) {
+func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, totalJoiningCycle map[int]float64) (float64, float64, map[int]float64, map[int]float64, map[int]float64) {
 	totalProfit := make(map[int]float64)
-	var cycleProfits,Revenue float64
+	totalExpense := make(map[int]float64)
+	totalRevenue := make(map[int]float64)
+	var cycleProfits, Revenue, Expense float64
 	for i, list := range all_Data {
 		var expense, cycleRevenue float64
 		for _, member := range list {
@@ -440,11 +475,13 @@ func FindProfitTOCompany(all_Data [][]*TreeStructure, ExpenseMembers float64, to
 		}
 		profit := cycleRevenue - expense
 		cycleProfits = cycleProfits + profit
+		Expense = Expense + expense
 		Revenue = Revenue + cycleRevenue
+		totalRevenue[i] = Revenue
 		totalProfit[i] = profit
+		totalExpense[i] = Expense
 	}
-	fmt.Println(">>>",Revenue)
-	return cycleProfits, Revenue, totalProfit
+	return cycleProfits, Revenue, totalProfit, totalExpense, totalRevenue
 }
 
 func CalculatePoolBonus(all_Data [][]*TreeStructure, totalProfit map[int]float64, pool_perc float64, dist_no int) (float64, map[int]float64) {
@@ -562,15 +599,15 @@ func AllocateUnilevelMembers(numMembers int, product_quantity []int, startID int
 	return allCycles, cycleCount, all_data, totalJoiningFee
 }
 
-func CalculateUnilevelSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, sponsor_bonus_type string, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
+func CalculateUnilevelSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, uni_sponsor_bonus_type string, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
 	var TSB, sponsorBonus float64
 	totalBonus := make(map[int]float64)
 	for _, list := range allData {
 		for _, member := range list {
 			if member.ParentID != nil {
-				if strings.Contains(sponsor_bonus_type, "percent") {
+				if strings.Contains(uni_sponsor_bonus_type, "percent") {
 					sponsorBonus = member.ParentID.SponsorBonus + member.Joining_package_fee*sponsorBonusPercent/100
-				} else if strings.Contains(sponsor_bonus_type, "usd") {
+				} else if strings.Contains(uni_sponsor_bonus_type, "usd") {
 					sponsorBonus = member.ParentID.SponsorBonus + sponsorBonusPercent
 				}
 				if strings.Contains(cappingScope, "sponsor") && sponsorBonus > cappingAmount {
@@ -776,15 +813,15 @@ func AllocateMatrixMembers(numMembers int, product_quantity []int, startID int, 
 	return allCycles, cycleCount, all_data, totalJoiningFee
 }
 
-func CalculateMatrixSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, sponsor_bonus_type string, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
+func CalculateMatrixSponsorBonus(allData [][]*TreeStructure, sponsorBonusPercent float64, mat_sponsor_bonus_type string, cappingAmount float64, cappingScope string) (float64, map[int]float64) {
 	var TSB, sponsorBonus float64
 	totalBonus := make(map[int]float64)
 	for _, list := range allData {
 		for _, member := range list {
 			if member.ParentID != nil {
-				if strings.Contains(sponsor_bonus_type, "percent") {
+				if strings.Contains(mat_sponsor_bonus_type, "percent") {
 					sponsorBonus = member.ParentID.SponsorBonus + member.Joining_package_fee*sponsorBonusPercent/100
-				} else if strings.Contains(sponsor_bonus_type, "usd") {
+				} else if strings.Contains(mat_sponsor_bonus_type, "usd") {
 					sponsorBonus = member.ParentID.SponsorBonus + sponsorBonusPercent
 				}
 				if strings.Contains(cappingScope, "sponsor") && sponsorBonus > cappingAmount {
@@ -1001,12 +1038,23 @@ func main() {
 			http.Error(w, "Invalid or missing 'bonus_option' field", http.StatusBadRequest)
 			return
 		}
-		sponsor_bonus_type, ok := data["sponsor_bonus_type"].(string)
+		sponsor_bonus_type1, ok := data["sponsor_bonus_type1"].(string)
 		if !ok {
-			http.Error(w, "Invalid or missing 'sponsor_bonus_type' field", http.StatusBadRequest)
+			http.Error(w, "Invalid or missing 'sponsor_bonus_type1' field", http.StatusBadRequest)
 			return
 		}
-		fmt.Println("sponsor_bonus_type", sponsor_bonus_type)
+
+		sponsor_bonus_type2, ok := data["sponsor_bonus_type2"].(string)
+		if !ok {
+			http.Error(w, "Invalid or missing 'sponsor_bonus_type2' field", http.StatusBadRequest)
+			return
+		}
+		binary_bonus_type, ok := data["binary_bonus_type"].(string)
+		if !ok {
+			http.Error(w, "Invalid or missing 'binary_bonus_type' field", http.StatusBadRequest)
+			return
+		}
+		print(binary_bonus_type)
 		binaryRatio, ok := data["ratio"].(string)
 		if !ok {
 			http.Error(w, "Missing or invalid 'ratio' field", http.StatusBadRequest)
@@ -1065,10 +1113,10 @@ func main() {
 			cycleList = append(cycleList, copiedMembers)
 		}
 
-		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type, cappingAmount, cappingScope, bonusOption)
-		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount, binaryPercentage)
+		totalSponsorBonus, totalSPONSORBonus := CalculateSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type1, sponsor_bonus_type2, cappingAmount, cappingScope, bonusOption)
+		totalBinaryBonus, totalBINARYBonus := BinaryWithRatio(cycleList, bonusOption, binaryRatio, int(ratioAmount), cappingScope, cappingAmount, cycleCount, binaryPercentage, binary_bonus_type)
 		totalMatchingBonus, totalMATCHINGBonus := CalculateMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
-		totalProfitToCompany, Revenue, totalProfit := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
+		totalProfitToCompany, Revenue, totalProfit, totalExpense, totalRevenue := FindProfitTOCompany(cycleList, ExpenseMembers, totalJoiningCycle)
 		totalPoolBonus, totalPOOLBonus := CalculatePoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
 		TotalExpense := totalSponsorBonus + totalBinaryBonus + totalMatchingBonus + totalPoolBonus
 		sum := 0.0
@@ -1076,12 +1124,13 @@ func main() {
 			sum = sum + cycle
 		}
 		totalProfitToCompany = sum
-
 		results := map[string]interface{}{
 			"totalProfitToCompany": totalProfitToCompany,
 			"totalProfit":          totalProfit,
 			"TotalExpense":         TotalExpense,
-			"Revenue":				Revenue,
+			"totalExpense":         totalExpense,
+			"totalRevenue":         totalRevenue,
+			"Revenue":              Revenue,
 			// "treeNodes":            treeNodes,
 			"stored_id":            stored_id,
 			"cycleCount":           cycleCount,
@@ -1129,9 +1178,9 @@ func main() {
 			http.Error(w, "Invalid or missing 'sponsor_percentage' field", http.StatusBadRequest)
 			return
 		}
-		sponsor_bonus_type, ok := data["sponsor_bonus_type"].(string)
+		uni_sponsor_bonus_type, ok := data["uni_sponsor_bonus_type"].(string)
 		if !ok {
-			http.Error(w, "Invalid or missing 'sponsor_bonus_type' field", http.StatusBadRequest)
+			http.Error(w, "Invalid or missing 'uni_sponsor_bonus_type' field", http.StatusBadRequest)
 			return
 		}
 		floatData := make([]float64, 0)
@@ -1254,7 +1303,7 @@ func main() {
 			cycleList = append(cycleList, copiedMembers)
 		}
 
-		totalUnilevelSponsorBonus, totalUnilevelSPONSORBonus := CalculateUnilevelSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type, cappingAmount, cappingScope)
+		totalUnilevelSponsorBonus, totalUnilevelSPONSORBonus := CalculateUnilevelSponsorBonus(cycleList, sponsorPercentage, uni_sponsor_bonus_type, cappingAmount, cappingScope)
 		totalUnilevelMatchingBonus, totalUnilevelMATCHINGBonus := CalculateUnilevelMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
 		totalUnilevelProfitToCompany, totalProfit, totalPoolBonus, totalPOOLBonus := FindUnilevelProfitToCompany(cycleList, ExpenseMembers, totalJoiningCycle, PoolPerc)
 		// totalPoolBonus, totalPOOLBonus := CalculateUnilevelPoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))
@@ -1311,9 +1360,16 @@ func main() {
 			http.Error(w, "Invalid or missing 'expense_per_user' field", http.StatusBadRequest)
 			return
 		}
+		fmt.Println("11")
 		sponsorPercentage, ok := data["sponsor_percentage"].(float64)
 		if !ok {
 			http.Error(w, "Invalid or missing 'sponsor_percentage' field", http.StatusBadRequest)
+			return
+		}
+		fmt.Println("22")
+		mat_sponsor_bonus_type, ok := data["mat_sponsor_bonus_type"].(string)
+		if !ok {
+			http.Error(w, "Invalid or missing 'mat_sponsor_bonus_type' field", http.StatusBadRequest)
 			return
 		}
 		floatData := make([]float64, 0)
@@ -1364,11 +1420,6 @@ func main() {
 					intData = append(intData, int(num))
 				}
 			}
-		}
-		sponsor_bonus_type, ok := data["sponsor_bonus_type"].(string)
-		if !ok {
-			http.Error(w, "Invalid or missing 'sponsor_bonus_type' field", http.StatusBadRequest)
-			return
 		}
 		cappingAmount, ok := data["capping_amount"].(float64)
 		if !ok {
@@ -1435,7 +1486,7 @@ func main() {
 			cycleList = append(cycleList, copiedMembers)
 		}
 
-		CalculateMatrixSponsorBonus, totalMatrixSPONSORBonus := CalculateMatrixSponsorBonus(cycleList, sponsorPercentage, sponsor_bonus_type, cappingAmount, cappingScope)
+		CalculateMatrixSponsorBonus, totalMatrixSPONSORBonus := CalculateMatrixSponsorBonus(cycleList, sponsorPercentage, mat_sponsor_bonus_type, cappingAmount, cappingScope)
 		CalculateMatrixMatchingBonus, totalMatrixMATCHINGBonus := CalculateMatrixMatchingBonus(cycleList, percData, cappingAmount, cappingScope)
 		FindMatrixProfitToCompany, totalProfit, totalPoolBonus, totalPOOLBonus := FindMatrixProfitToCompany(cycleList, ExpenseMembers, totalJoiningCycle, PoolPerc)
 		// totalPoolBonus, totalPOOLBonus := CalculateMatrixPoolBonus(cycleList, totalProfit, PoolPerc, int(DistNo))

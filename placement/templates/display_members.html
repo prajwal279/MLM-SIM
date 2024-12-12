@@ -69,14 +69,23 @@
     </div>
 
     <!-- Bonus Breakdown Line Chart (Chart.js) -->
-    <div style="height:40vh; margin: 20px auto;display: block;
-  box-sizing: border-box;
-  height: 700px;
-  width: 1200px;
-  margin: 20px auto;">
-        <canvas id="bonusChart"></canvas>
+    {% comment %} <div style="height:40vh; margin: 20px auto;display: block;
+        box-sizing: border-box;
+        height: 700px;
+        width: 900px;
+        margin: 20px auto;">
+        <canvas id="bonusChart1"></canvas>
+        <canvas id="chartData2"></canvas>
+    </div> {% endcomment %}
+    <div style="margin: 20px auto; display: block; width: 900px;">
+        <div style="height: 40vh; margin-bottom: 20px;">
+            <canvas id="bonusChart1"></canvas>
+        </div>
+        <div style="height: 40vh;">
+            <canvas id="bonusChart2"></canvas>
+        </div>
     </div>
-
+                      
     
     
 
@@ -92,13 +101,11 @@
             var totalPoolBonus = {{ results.totalPoolBonus }};
             var totalProfitToCompany = {{ results.totalProfitToCompany }};
             var TotalExpense = {{ results.TotalExpense }};
-            var Revenue = {{results.Revenue}};
             // First Pie Chart: Company Financials
             const data1 = google.visualization.arrayToDataTable([
                 ['Category', 'Amount'],
                 ['Profit', totalProfitToCompany],
                 ['Expense', TotalExpense],
-                //['Revenue', Revenue],
             ]);
     
             const options1 = {
@@ -107,8 +114,7 @@
                 pieSliceText: 'percentage', 
                 slices: {
                     0: {offset: 0.1, color: '#66bb6a'},
-                    1: {offset: 0.05, color: '#f44336'},
-                   // 2: {offset: 0.03, color: '#4c51bf'} 
+                    1: {offset: 0.05, color: '#f44336'} 
                 },
                 fontName: 'Arial',
                 fontSize: 14,
@@ -176,9 +182,12 @@
         const binaryBonusData = {{ results.totalBINARYBonus|safe }};
         const matchingBonusData = {{ results.totalMATCHINGBonus|safe }};
         const poolBonusData = {{ results.totalPOOLBonus|safe }};
-
-
-        const chartData = {
+        const totalProfit = {{ results.totalProfit|safe }};
+        const totalExpense = {{ results.totalExpense|safe }};
+        const totalRevenue = {{ results.totalRevenue|safe}};
+    
+        // Data for the first graph
+        const chartData1 = {
             datasets: [
                 {
                     label: 'Sponsor Bonus',
@@ -209,29 +218,45 @@
                     fill: true
                 }
             ]
-
         };
-
-        const config = {
-            type: 'line', 
-            data: chartData,
+    
+        // Data for the second graph
+        const chartData2 = {
+            datasets: [
+                {
+                    label: 'Profit',
+                    data: totalProfit,  
+                    borderColor: 'rgba(75, 192, 192, 1)',  // Teal color
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light Teal
+                    fill: true
+                },
+                {
+                    label: 'Expense',
+                    data: totalExpense,  
+                    borderColor: 'rgba(255, 99, 132, 1)',  // Red color
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',  // Light Red
+                    fill: true
+                },
+                {
+                    label: 'Revenue',
+                    data: totalRevenue,  
+                    borderColor: 'rgba(54, 162, 235, 1)',  // Blue color
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',  // Light Blue
+                    fill: true
+                }
+            ]
+        };
+    
+        // Configuration for the first chart
+        const config1 = {
+            type: 'line',
+            data: chartData1,
             options: {
                 responsive: true,
                 plugins: {
                     title: {
                         display: true,
                         text: 'Bonus Breakdown for Each Cycle'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                const label = tooltipItem.label || '';
-                                const value = tooltipItem.raw || 0;
-                                return `${label}: ${value.toLocaleString()}`;
-                            }
-                            mode: 'index',
-                            intersect: false,
-                        }
                     },
                     legend: {
                         position: 'top',
@@ -244,16 +269,73 @@
                 }
             },
         };
-
-        const ctx = document.getElementById('bonusChart').getContext('2d');
-        new Chart(ctx, config);
+    
+        // Configuration for the second chart
+        const config2 = {
+            type: 'line',
+            data: chartData2,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Profit vs Expense'
+                    },
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                }
+            },
+        };
+    
+        // Render the first chart
+        const ctx1 = document.getElementById('bonusChart1').getContext('2d');
+        new Chart(ctx1, config1);
+    
+        // Render the second chart
+        const ctx2 = document.getElementById('bonusChart2').getContext('2d');
+        new Chart(ctx2, config2);
     </script>
+    
     
    <div class="table-container">
     <table>
         <tr>
             <th>No. of Members</th>
             <td>{{ num_members }}</td> 
+        </tr>
+        <tr>
+            <th>Sponsor Percentage</th>
+            <td>{{ sponsor_percentage }}</td> 
+        </tr>
+        <tr>
+            <th>Binary Percentage</th>
+            <td>{{ binary_percentage }}</td> 
+        </tr>
+        <tr>
+            <th>Matching Percentage</th>
+            <td>{{ matching_percentage }}</td> 
+        </tr>
+        <tr>
+            <th>Joining Package Fee</th>
+            <td>{{ joining_package_fee }}</td> 
+        </tr>
+        <tr>
+            <th>Ratio</th>
+            <td>{{ ratio }}</td> 
+        </tr>
+        <tr>
+            <th>Ratio Amount</th>
+            <td>{{ ratio_amount }}</td> 
+        </tr>
+        <tr>
+            <th>Product Quantity</th>
+            <td>{{ product_quantity }}</td> 
         </tr>
         <tr>
             <th>Income from Joining Package Purchase</th>
@@ -276,12 +358,17 @@
             <td>{{ results.totalPoolBonus }}</td> 
         </tr>
         <tr>
-            <th>TOTAL PROFIT</th>
-            <td>{{ results.totalProfitToCompany }}</td> 
+            <th>TOTAL REVENUE</th>
+            <td>{{ results.Revenue }}</td> 
         </tr>
+        <tr>
         <tr>
             <th>TOTAL EXPENSE</th>
             <td>{{ results.TotalExpense }}</td> 
+        </tr>
+        <tr>
+            <th>TOTAL PROFIT</th>
+            <td>{{ results.totalProfitToCompany }}</td> 
         </tr>
     </table>
 </div>

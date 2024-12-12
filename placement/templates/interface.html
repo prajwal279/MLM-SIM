@@ -303,15 +303,25 @@
                         <button type="button" class="btn btn-binary rounded" id="pairing" value="pairing_value">PAIRING</button>
                     </div>
                 </div>
-                <div id="weeklegForm" class="plan-card hidden mt-4 w-100">   
+                <div id="weeklegForm" class="plan-card hidden mt-4 w-100">  
                     <div class="row g-3">
                         <div class="col-md-4">
+                            <label for="binaryPercentage" class="form-label small text-muted">Binary Percentage</label>
+                            <div class="input-group">
+                                <input class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
+                                <select class="input-group-text" style="width: 80px; height: 37.5333px;" id="binaryPercentage" name="binary_bonus_type">
+                                    <option value="percent" selected>%</option>
+                                    <option value="usd">USD</option>
+                                </select>
+                            </div>
+                        </div> 
+                        <!-- <div class="col-md-4">
                             <label for="binaryPercentage" class="form-label small text-muted">Binary Percentage</label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="binaryPercentage" name="binary_bonus_percent" placeholder="Binary %">
                                 <span class="input-group-text">%</span>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                             <label for="binaryOption" class="form-label small text-muted">Bonus Option</label>
                             <div class="input-group">
@@ -323,9 +333,10 @@
                             <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                             <div class="input-group">
                                 <input class="form-control" id="sponsorBonus"  name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
-                                <select class="input-group-text" style="width: 80px; height: 37.5333px;" id="sponsorBonusType" name="sponsor_bonus_type">
+                                <select class="input-group-text" style="width: 80px; height: 37.5333px;" id="sponsorBonusType1" name="sponsor_bonus_type1">
                                     <option value="percent" selected>%</option>
                                     <option value="usd">USD</option>
+                                    <option value="-1" style="display: none;" id="defaul1"></option>
                                 </select>
                             </div>
                         </div>
@@ -356,9 +367,10 @@
                             <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                             <div class="input-group">
                                 <input type="number"  class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
-                                <select class="input-group-text" style="width: 80px; height: 37.5333px;" id="sponsorBonus" name="sponsor_bonus_type">
+                                <select class="input-group-text" style="width: 80px; height: 37.5333px;" id="sponsorBonus" name="sponsor_bonus_type2">
                                     <option value="percent" selected>%</option>
                                     <option value="usd">USD</option>
+                                    <option value="-1" style="display: none;" id="defaul2"></option>
                                 </select>
                             </div>
                         </div>
@@ -415,8 +427,8 @@
                 <div class="col-md-4">
                     <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
-                        <select class="input-group-text" style="width: 80px; height: 37.5333px;"  id="sponsorBonus" name="sponsor_bonus_type">
+                        <input type="number" class="form-control" id="sponsorBonusPercent" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
+                        <select class="input-group-text" id="sponsorBonusType" name="uni_sponsor_bonus_type" style="width: 80px; height: 37.5333px;">
                             <option value="percent" selected>%</option>
                             <option value="usd">USD</option>
                         </select>
@@ -445,13 +457,13 @@
                 <div class="col-md-4">
                     <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus">
-                        <select class="input-group-text" style="width: 80px; height: 37.5333px;" id="sponsorBonus" name="sponsor_bonus_type">
+                        <input type="number" class="form-control" id="sponsorBonus" name="sponsor_bonus_percent" placeholder="Sponsor Bonus %">
+                        <select class="input-group-text" id="sponsorBonusType" name="mat_sponsor_bonus_type" style="width: 80px; height: 37.5333px;">
                             <option value="percent" selected>%</option>
                             <option value="usd">USD</option>
                         </select>
                     </div>
-                </div>      
+                </div>    
                 <!-- <div class="col-md-4">
                     <label for="sponsorBonus" class="form-label small text-muted">Sponsor Bonus</label>
                     <div class="input-group">
@@ -711,6 +723,7 @@
         if (ratioAmountInput) {
             ratioAmountInput.value = 1.0;
         }
+        document.getElementById("sponsorBonusType2").value = -1
     });
     window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('weekleg').click();
@@ -719,6 +732,7 @@
     document.getElementById('pairing').addEventListener('click', function() {
         document.getElementById('pairingForm').classList.remove('hidden');
         document.getElementById('weeklegForm').classList.add('hidden');
+        document.getElementById("sponsorBonusType1").value = -1
         //document.getElementById("sponsor_bonus_percent".value) = "pairing_value"; 
     });
 
